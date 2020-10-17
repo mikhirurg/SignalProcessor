@@ -58,18 +58,6 @@ public class SineSignalSettings extends SignalSettings {
         add(initPhase, c);
     }
 
-    public void setAmplitude(String data) {
-        amplitude.setText(data);
-    }
-
-    public void setFrequency(String data) {
-        freq.setText(data);
-    }
-
-    public void setInitPhase(String data) {
-        initPhase.setText(data);
-    }
-
     public double getAmplitude() {
         return Double.parseDouble(amplitude.getText());
     }
