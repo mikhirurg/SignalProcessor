@@ -1,28 +1,30 @@
 package io.github.mikhirurg.signalprocessor.gui;
 
-import io.github.mikhirurg.signalprocessor.gui.SignalSettings;
 import io.github.mikhirurg.signalprocessor.math.ConstantSignal;
 import io.github.mikhirurg.signalprocessor.math.Signal;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ResourceBundle;
 
 public class ConstantSignalSettings extends SignalSettings {
-
+    private final ResourceBundle resourceBundle;
     private final JTextField val;
 
-    public ConstantSignalSettings(double defVal) {
+    public ConstantSignalSettings(double defVal, ResourceBundle resourceBundle) {
         val = new JTextField(String.valueOf(defVal));
+        this.resourceBundle = resourceBundle;
         buildGui();
     }
 
-    public ConstantSignalSettings() {
+    public ConstantSignalSettings(ResourceBundle resourceBundle) {
+        this.resourceBundle = resourceBundle;
         val = new JTextField("0");
         buildGui();
     }
 
     private void buildGui() {
-        JLabel valLabel = new JLabel("Value");
+        JLabel valLabel = new JLabel(resourceBundle.getString("label.value"));
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
@@ -46,6 +48,6 @@ public class ConstantSignalSettings extends SignalSettings {
 
     @Override
     public String getSignalName() {
-        return "Constant";
+        return resourceBundle.getString("type.constant");
     }
 }

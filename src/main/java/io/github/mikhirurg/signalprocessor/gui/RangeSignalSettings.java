@@ -5,20 +5,24 @@ import io.github.mikhirurg.signalprocessor.math.Signal;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ResourceBundle;
 
 public class RangeSignalSettings extends SignalSettings {
+    private final ResourceBundle resourceBundle;
     private final JTextField minVal;
     private final JTextField maxVal;
     private final JTextField amplitude;
 
-    public RangeSignalSettings(double defMinVal, double defMaxVal, double defAmplitude) {
+    public RangeSignalSettings(double defMinVal, double defMaxVal, double defAmplitude, ResourceBundle resourceBundle) {
         amplitude = new JTextField(String.valueOf(defMinVal));
         minVal = new JTextField(String.valueOf(defMaxVal));
         maxVal = new JTextField(String.valueOf(defAmplitude));
+        this.resourceBundle = resourceBundle;
         buildGui();
     }
 
-    public RangeSignalSettings() {
+    public RangeSignalSettings(ResourceBundle resourceBundle) {
+        this.resourceBundle = resourceBundle;
         amplitude = new JTextField("0");
         minVal = new JTextField("0");
         maxVal = new JTextField("0");
@@ -26,9 +30,9 @@ public class RangeSignalSettings extends SignalSettings {
     }
 
     private void buildGui() {
-        JLabel amplitudeLabel = new JLabel("Amplitude");
-        JLabel minValLabel = new JLabel("Min value");
-        JLabel maxValLabel = new JLabel("Max value");
+        JLabel amplitudeLabel = new JLabel(resourceBundle.getString("label.amplitude"));
+        JLabel minValLabel = new JLabel(resourceBundle.getString("label.minvalue"));
+        JLabel maxValLabel = new JLabel(resourceBundle.getString("label.maxvalue"));
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
@@ -75,6 +79,6 @@ public class RangeSignalSettings extends SignalSettings {
 
     @Override
     public String getSignalName() {
-        return "Range";
+        return resourceBundle.getString("type.range");
     }
 }

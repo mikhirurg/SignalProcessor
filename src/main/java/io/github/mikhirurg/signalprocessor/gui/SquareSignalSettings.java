@@ -5,21 +5,24 @@ import io.github.mikhirurg.signalprocessor.math.SquareSignal;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ResourceBundle;
 
 public class SquareSignalSettings extends SignalSettings {
-
+    private final ResourceBundle resourceBundle;
     private final JTextField amplitude;
     private final JTextField frequency;
     private final JTextField approx;
 
-    public SquareSignalSettings(double defCycleFreq, int defApprox, double defAmplitude) {
+    public SquareSignalSettings(double defCycleFreq, int defApprox, double defAmplitude, ResourceBundle resourceBundle) {
         frequency = new JTextField(String.valueOf(defCycleFreq));
         approx = new JTextField(String.valueOf(defApprox));
         amplitude = new JTextField(String.valueOf(defAmplitude));
+        this.resourceBundle = resourceBundle;
         buildGui();
     }
 
-    public SquareSignalSettings() {
+    public SquareSignalSettings(ResourceBundle resourceBundle) {
+        this.resourceBundle = resourceBundle;
         frequency = new JTextField("0");
         approx = new JTextField("0");
         amplitude = new JTextField("0");
@@ -45,13 +48,13 @@ public class SquareSignalSettings extends SignalSettings {
 
     @Override
     public String getSignalName() {
-        return "Square";
+        return resourceBundle.getString("type.sine");
     }
 
     private void buildGui() {
-        JLabel amplitudeLabel = new JLabel("Amplitude");
-        JLabel cycleFrequencyLabel = new JLabel("Frequency");
-        JLabel approxLabel = new JLabel("Approximation");
+        JLabel amplitudeLabel = new JLabel(resourceBundle.getString("label.amplitude"));
+        JLabel cycleFrequencyLabel = new JLabel(resourceBundle.getString("label.frequency"));
+        JLabel approxLabel = new JLabel(resourceBundle.getString("label.approximation"));
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;

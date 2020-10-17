@@ -111,10 +111,6 @@ public class Display extends JPanel {
         this.yInput = yInput;
     }
 
-    public boolean isGrid() {
-        return isGrid;
-    }
-
     public void setGrid(boolean grid) {
         isGrid = grid;
     }
