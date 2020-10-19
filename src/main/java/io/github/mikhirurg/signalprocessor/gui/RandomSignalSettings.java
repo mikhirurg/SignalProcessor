@@ -10,18 +10,21 @@ import java.util.ResourceBundle;
 public class RandomSignalSettings extends SignalSettings {
 
     private final ResourceBundle resourceBundle;
+    private final ResourceBundle resourceBundleUS;
     private final JTextField minVal;
     private final JTextField maxVal;
 
-    public RandomSignalSettings(double defMinVal, double defMaxVal, ResourceBundle resourceBundle) {
+    public RandomSignalSettings(double defMinVal, double defMaxVal, ResourceBundle resourceBundle, ResourceBundle resourceBundleUS) {
         this.resourceBundle = resourceBundle;
         minVal = new JTextField(String.valueOf(defMinVal));
         maxVal = new JTextField(String.valueOf(defMaxVal));
+        this.resourceBundleUS = resourceBundleUS;
         buildGui();
     }
 
-    public RandomSignalSettings(ResourceBundle resourceBundle) {
+    public RandomSignalSettings(ResourceBundle resourceBundle, ResourceBundle resourceBundleUS) {
         this.resourceBundle = resourceBundle;
+        this.resourceBundleUS = resourceBundleUS;
         minVal = new JTextField("0");
         maxVal = new JTextField("0");
         buildGui();
@@ -65,5 +68,10 @@ public class RandomSignalSettings extends SignalSettings {
     @Override
     public String getSignalName() {
         return resourceBundle.getString("type.random");
+    }
+
+    @Override
+    public String getSignalId() {
+        return resourceBundleUS.getString("type.random");
     }
 }

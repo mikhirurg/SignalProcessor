@@ -1,6 +1,7 @@
 package io.github.mikhirurg.signalprocessor.gui;
 
 import io.github.mikhirurg.signalprocessor.math.ConstantSignal;
+import io.github.mikhirurg.signalprocessor.math.RandomSignal;
 import io.github.mikhirurg.signalprocessor.math.Signal;
 
 import javax.swing.*;
@@ -29,8 +30,8 @@ public class Display extends JPanel {
     public Display(Properties appProperties) {
         this.width = Integer.parseInt(appProperties.getProperty("display.width"));
         this.height = Integer.parseInt(appProperties.getProperty("display.height"));
-        xInput = new ConstantSignal(0);
-        yInput = new ConstantSignal(0);
+        xInput = new ConstantSignal(0, false, new RandomSignal(0, 0));
+        yInput = new ConstantSignal(0, false, new RandomSignal(0, 0));
         setPreferredSize(new Dimension(width, height));
 
         setBackground(Color.BLACK);

@@ -39,9 +39,10 @@ public class DisplayImage {
         img2d.setColor(Color.BLACK);
         img2d.fillRect(0, 0, width, height);
 
-        for (Line line : lineList) {
+        for (int i = 0; i < lineList.size(); i++) {
+            Line line = lineList.get(i);
             double segLen = Math.sqrt((line.x0 - line.x1) * (line.x0 - line.x1) + (line.y0 - line.y1) * (line.y0 - line.y1));
-            img2d.setColor(new Color(201, 255, 218, Math.min(255, (int) (len / segLen * 255))));
+            img2d.setColor(new Color(201, 255, 218, Math.min(255, (int) (len / segLen * ((double) i) / lineList.size() * 255))));
             img2d.drawLine((int) line.x0, (int) line.y0, (int) line.x1, (int) line.y1);
         }
         return img;

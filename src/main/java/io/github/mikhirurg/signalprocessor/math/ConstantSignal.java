@@ -3,12 +3,16 @@ package io.github.mikhirurg.signalprocessor.math;
 public class ConstantSignal implements Signal {
 
     private double val;
+    private final boolean addRandom;
+    private final RandomSignal randomSignal;
 
-    public ConstantSignal(double val) {
+    public ConstantSignal(double val, boolean addRandom, RandomSignal randomSignal) {
         this.val = val;
+        this.addRandom = addRandom;
+        this.randomSignal = randomSignal;
     }
 
     public double generateValue(double t) {
-        return val;
+        return addRandom ? val + randomSignal.generateValue(t) : val;
     }
 }
