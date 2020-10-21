@@ -3,10 +3,14 @@ package io.github.mikhirurg.signalprocessor.gui;
 import io.github.mikhirurg.signalprocessor.math.ConstantSignal;
 import io.github.mikhirurg.signalprocessor.math.RandomSignal;
 import io.github.mikhirurg.signalprocessor.math.Signal;
+import io.github.mikhirurg.signalprocessor.util.Application;
+import io.github.mikhirurg.signalprocessor.util.Cortege;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Properties;
+import java.util.LinkedList;
+import java.util.List;
+
 
 public class Display extends JPanel {
     private Signal xInput;
@@ -16,6 +20,8 @@ public class Display extends JPanel {
     private final DisplayImage image;
     private long startTime;
     private boolean isGrid;
+    private List<Cortege<Double>> data;
+    private boolean isSaving;
 
     private final int width;
     private final int height;
@@ -27,9 +33,9 @@ public class Display extends JPanel {
     private boolean everRun = false;
 
 
-    public Display(Properties appProperties) {
-        this.width = Integer.parseInt(appProperties.getProperty("display.width"));
-        this.height = Integer.parseInt(appProperties.getProperty("display.height"));
+    public Display() {
+        this.width = Integer.parseInt(Application.getProperty("display.width"));
+        this.height = Integer.parseInt(Application.getProperty("display.height"));
         xInput = new ConstantSignal(0, false, new RandomSignal(0, 0));
         yInput = new ConstantSignal(0, false, new RandomSignal(0, 0));
         setPreferredSize(new Dimension(width, height));
@@ -42,12 +48,14 @@ public class Display extends JPanel {
         image = new DisplayImage(
                 width,
                 height,
-                Integer.parseInt(appProperties.getProperty("display.capacity")),
-                Integer.parseInt(appProperties.getProperty("display.len"))
+                Integer.parseInt(Application.getProperty("display.capacity")),
+                Integer.parseInt(Application.getProperty("display.len"))
         );
-        gridSize = Integer.parseInt(appProperties.getProperty("grid.size"));
+        gridSize = Integer.parseInt(Application.getProperty("grid.size"));
         oldX = width / 2.0;
         oldY = height / 2.0;
+        isSaving = false;
+        data = new LinkedList<>();
     }
 
     public void paintComponent(Graphics g) {
@@ -57,8 +65,15 @@ public class Display extends JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         if (timer.isRunning()) {
             double time = (System.currentTimeMillis() - startTime) / 1000.0;
-            double x = width / 2.0 + xInput.generateValue(time);
-            double y = height / 2.0 - yInput.generateValue(time);
+
+            double genx = xInput.generateValue(time);
+            double geny = yInput.generateValue(time);
+
+            if (isSaving)
+                data.add(new Cortege<>(time, genx, geny));
+
+            double x = width / 2.0 + genx;
+            double y = height / 2.0 - geny;
             image.drawLine(new Line(oldX, oldY, x, y));
             oldX = x;
             oldY = y;
@@ -79,11 +94,15 @@ public class Display extends JPanel {
         Stroke oldStroke = g2d.getStroke();
         g2d.setStroke(new BasicStroke(0.5f));
         g2d.setColor(new Color(255, 255, 255, 80));
-        for (int y = 0; y <= height; y += gridSize) {
+        for (int y = height / 2; y <= height; y += gridSize) {
             g2d.drawLine(0, y, width, y);
+            if (y > height / 2)
+                g2d.drawLine(0, height - y, width, height - y);
         }
-        for (int x = 0; x <= width; x += gridSize) {
+        for (int x = width / 2; x <= width; x += gridSize) {
             g2d.drawLine(x, 0, x, height);
+            if (x > width / 2)
+                g2d.drawLine(width - x, 0, width - x, height);
         }
         g2d.setColor(old);
         g2d.setStroke(oldStroke);
@@ -102,6 +121,18 @@ public class Display extends JPanel {
     public void clear() {
         image.clear();
         repaint();
+    }
+
+    public List<Cortege<Double>> getData() {
+        return data;
+    }
+
+    public void setSaving(boolean isSaving) {
+        this.isSaving = isSaving;
+    }
+
+    public void clearData() {
+        data = new LinkedList<>();
     }
 
     public void setxInput(Signal xInput) {

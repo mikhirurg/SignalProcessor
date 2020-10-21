@@ -3,43 +3,38 @@ package io.github.mikhirurg.signalprocessor.gui;
 import io.github.mikhirurg.signalprocessor.math.ConstantSignal;
 import io.github.mikhirurg.signalprocessor.math.RandomSignal;
 import io.github.mikhirurg.signalprocessor.math.Signal;
+import io.github.mikhirurg.signalprocessor.util.Application;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ResourceBundle;
 
 public class ConstantSignalSettings extends SignalSettings {
-    private final ResourceBundle resourceBundle;
-    private final ResourceBundle resourceBundleUS;
     private final JTextField val;
     private final JCheckBox addRandom;
     private final JTextField minRVal;
     private final JTextField maxRVal;
 
-    public ConstantSignalSettings(double defVal, ResourceBundle resourceBundle, ResourceBundle resourceBundleUS) {
+    public ConstantSignalSettings(double defVal) {
         val = new JTextField(String.valueOf(defVal));
-        this.resourceBundle = resourceBundle;
-        this.resourceBundleUS = resourceBundleUS;
         minRVal = new JTextField("0");
         maxRVal = new JTextField("0");
-        addRandom = new JCheckBox(resourceBundle.getString("checkbox.noise"));
+        addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         buildGui();
     }
 
-    public ConstantSignalSettings(ResourceBundle resourceBundle, ResourceBundle resourceBundleUS) {
-        this.resourceBundle = resourceBundle;
-        this.resourceBundleUS = resourceBundleUS;
+    public ConstantSignalSettings() {
         val = new JTextField("0");
         minRVal = new JTextField("0");
         maxRVal = new JTextField("0");
-        addRandom = new JCheckBox(resourceBundle.getString("checkbox.noise"));
+        addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         buildGui();
     }
 
     private void buildGui() {
-        JLabel valLabel = new JLabel(resourceBundle.getString("label.value"));
-        JLabel minRValLabel = new JLabel(resourceBundle.getString("label.minvalue"));
-        JLabel maxRValLabel = new JLabel(resourceBundle.getString("label.maxvalue"));
+        JLabel valLabel = new JLabel(Application.getString("label.value"));
+        JLabel minRValLabel = new JLabel(Application.getString("label.minvalue"));
+        JLabel maxRValLabel = new JLabel(Application.getString("label.maxvalue"));
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.EAST;
@@ -81,6 +76,7 @@ public class ConstantSignalSettings extends SignalSettings {
         c.anchor = GridBagConstraints.EAST;
         c.gridx = 3;
         c.gridheight = 3;
+        c.insets.left = Integer.parseInt(Application.getProperty("settings.width")) / 5;
         add(noise, c);
     }
 
@@ -98,11 +94,11 @@ public class ConstantSignalSettings extends SignalSettings {
 
     @Override
     public String getSignalName() {
-        return resourceBundle.getString("type.constant");
+        return Application.getString("type.constant");
     }
 
     @Override
     public String getSignalId() {
-        return resourceBundleUS.getString("type.constant");
+        return Application.getUSString("type.constant");
     }
 }

@@ -2,7 +2,7 @@ package io.github.mikhirurg.signalprocessor.math;
 
 public class ConstantSignal implements Signal {
 
-    private double val;
+    private final double val;
     private final boolean addRandom;
     private final RandomSignal randomSignal;
 

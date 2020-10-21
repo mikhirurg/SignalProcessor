@@ -2,37 +2,31 @@ package io.github.mikhirurg.signalprocessor.gui;
 
 import io.github.mikhirurg.signalprocessor.math.RandomSignal;
 import io.github.mikhirurg.signalprocessor.math.Signal;
+import io.github.mikhirurg.signalprocessor.util.Application;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ResourceBundle;
 
 public class RandomSignalSettings extends SignalSettings {
 
-    private final ResourceBundle resourceBundle;
-    private final ResourceBundle resourceBundleUS;
     private final JTextField minVal;
     private final JTextField maxVal;
 
-    public RandomSignalSettings(double defMinVal, double defMaxVal, ResourceBundle resourceBundle, ResourceBundle resourceBundleUS) {
-        this.resourceBundle = resourceBundle;
+    public RandomSignalSettings(double defMinVal, double defMaxVal) {
         minVal = new JTextField(String.valueOf(defMinVal));
         maxVal = new JTextField(String.valueOf(defMaxVal));
-        this.resourceBundleUS = resourceBundleUS;
         buildGui();
     }
 
-    public RandomSignalSettings(ResourceBundle resourceBundle, ResourceBundle resourceBundleUS) {
-        this.resourceBundle = resourceBundle;
-        this.resourceBundleUS = resourceBundleUS;
+    public RandomSignalSettings() {
         minVal = new JTextField("0");
         maxVal = new JTextField("0");
         buildGui();
     }
 
     private void buildGui() {
-        JLabel minValLabel = new JLabel(resourceBundle.getString("label.minvalue"));
-        JLabel maxValLabel = new JLabel(resourceBundle.getString("label.maxvalue"));
+        JLabel minValLabel = new JLabel(Application.getString("label.minvalue"));
+        JLabel maxValLabel = new JLabel(Application.getString("label.maxvalue"));
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
@@ -67,11 +61,11 @@ public class RandomSignalSettings extends SignalSettings {
 
     @Override
     public String getSignalName() {
-        return resourceBundle.getString("type.random");
+        return Application.getString("type.random");
     }
 
     @Override
     public String getSignalId() {
-        return resourceBundleUS.getString("type.random");
+        return Application.getString("type.random");
     }
 }

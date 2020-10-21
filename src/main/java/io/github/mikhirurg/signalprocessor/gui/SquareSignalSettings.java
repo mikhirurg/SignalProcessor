@@ -3,14 +3,12 @@ package io.github.mikhirurg.signalprocessor.gui;
 import io.github.mikhirurg.signalprocessor.math.RandomSignal;
 import io.github.mikhirurg.signalprocessor.math.Signal;
 import io.github.mikhirurg.signalprocessor.math.SquareSignal;
+import io.github.mikhirurg.signalprocessor.util.Application;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ResourceBundle;
 
 public class SquareSignalSettings extends SignalSettings {
-    private final ResourceBundle resourceBundle;
-    private final ResourceBundle resourceBundleUS;
     private final JTextField amplitude;
     private final JTextField frequency;
     private final JTextField approx;
@@ -19,29 +17,25 @@ public class SquareSignalSettings extends SignalSettings {
     private final JTextField minRVal;
     private final JTextField maxRVal;
 
-    public SquareSignalSettings(double defCycleFreq, int defApprox, double defAmplitude, ResourceBundle resourceBundle, ResourceBundle resourceBundleUS) {
+    public SquareSignalSettings(double defCycleFreq, int defApprox, double defAmplitude) {
         frequency = new JTextField(String.valueOf(defCycleFreq));
         approx = new JTextField(String.valueOf(defApprox));
         amplitude = new JTextField(String.valueOf(defAmplitude));
-        this.resourceBundle = resourceBundle;
-        this.resourceBundleUS = resourceBundleUS;
-        reverseFourier = new JCheckBox(resourceBundle.getString("checkbox.reversefourier"));
+        reverseFourier = new JCheckBox(Application.getString("checkbox.reversefourier"));
         minRVal = new JTextField("0");
         maxRVal = new JTextField("0");
-        addRandom = new JCheckBox(resourceBundle.getString("checkbox.noise"));
+        addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         buildGui();
     }
 
-    public SquareSignalSettings(ResourceBundle resourceBundle, ResourceBundle resourceBundleUS) {
-        this.resourceBundle = resourceBundle;
-        this.resourceBundleUS = resourceBundleUS;
+    public SquareSignalSettings() {
         frequency = new JTextField("0");
         approx = new JTextField("0");
         amplitude = new JTextField("0");
-        reverseFourier = new JCheckBox(resourceBundle.getString("checkbox.reversefourier"));
+        reverseFourier = new JCheckBox(Application.getString("checkbox.reversefourier"));
         minRVal = new JTextField("0");
         maxRVal = new JTextField("0");
-        addRandom = new JCheckBox(resourceBundle.getString("checkbox.noise"));
+        addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         buildGui();
     }
 
@@ -67,26 +61,27 @@ public class SquareSignalSettings extends SignalSettings {
 
     @Override
     public String getSignalName() {
-        return resourceBundle.getString("type.sine");
+        return Application.getString("type.sine");
     }
 
     @Override
     public String getSignalId() {
-        return resourceBundleUS.getString("type.sine");
+        return Application.getUSString("type.sine");
     }
 
     private void buildGui() {
-        JLabel amplitudeLabel = new JLabel(resourceBundle.getString("label.amplitude"));
-        JLabel cycleFrequencyLabel = new JLabel(resourceBundle.getString("label.frequency"));
-        JLabel approxLabel = new JLabel(resourceBundle.getString("label.approximation"));
-        JLabel minRValLabel = new JLabel(resourceBundle.getString("label.minvalue"));
-        JLabel maxRValLabel = new JLabel(resourceBundle.getString("label.maxvalue"));
+        JLabel amplitudeLabel = new JLabel(Application.getString("label.amplitude"));
+        JLabel cycleFrequencyLabel = new JLabel(Application.getString("label.frequency"));
+        JLabel approxLabel = new JLabel(Application.getString("label.approximation"));
+        JLabel minRValLabel = new JLabel(Application.getString("label.minvalue"));
+        JLabel maxRValLabel = new JLabel(Application.getString("label.maxvalue"));
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = 1;
         c.gridheight = 1;
+        c.weightx = 1;
         c.anchor = GridBagConstraints.WEST;
         add(amplitudeLabel, c);
 
@@ -139,6 +134,7 @@ public class SquareSignalSettings extends SignalSettings {
         c.anchor = GridBagConstraints.EAST;
         c.gridx = 3;
         c.gridheight = 3;
+        c.insets.left = Integer.parseInt(Application.getProperty("settings.width")) / 5;
         add(noise, c);
     }
 }

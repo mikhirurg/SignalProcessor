@@ -3,14 +3,13 @@ package io.github.mikhirurg.signalprocessor.gui;
 import io.github.mikhirurg.signalprocessor.math.RandomSignal;
 import io.github.mikhirurg.signalprocessor.math.SawtoothSignal;
 import io.github.mikhirurg.signalprocessor.math.Signal;
+import io.github.mikhirurg.signalprocessor.util.Application;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ResourceBundle;
 
 public class SawtoothSignalSettings extends SignalSettings {
-    private final ResourceBundle resourceBundle;
-    private final ResourceBundle resourceBundleUS;
     private final JTextField freq;
     private final JTextField amplitude;
     private final JTextField approx;
@@ -19,38 +18,34 @@ public class SawtoothSignalSettings extends SignalSettings {
     private final JTextField minRVal;
     private final JTextField maxRVal;
 
-    public SawtoothSignalSettings(double defFreq, double defAmplitude, int defApprox, ResourceBundle resourceBundle, ResourceBundle resourceBundleUS) {
+    public SawtoothSignalSettings(double defFreq, double defAmplitude, int defApprox) {
         freq = new JTextField(String.valueOf(defFreq));
         amplitude = new JTextField(String.valueOf(defAmplitude));
         approx = new JTextField(String.valueOf(defApprox));
-        this.resourceBundle = resourceBundle;
-        this.resourceBundleUS = resourceBundleUS;
-        reverseFourier = new JCheckBox(resourceBundle.getString("checkbox.reversefourier"));
+        reverseFourier = new JCheckBox(Application.getString("checkbox.reversefourier"));
         minRVal = new JTextField("0");
         maxRVal = new JTextField("0");
-        addRandom = new JCheckBox(resourceBundle.getString("checkbox.noise"));
+        addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         buildGui();
     }
 
-    public SawtoothSignalSettings(ResourceBundle resourceBundle, ResourceBundle resourceBundleUS) {
-        this.resourceBundle = resourceBundle;
-        this.resourceBundleUS = resourceBundleUS;
+    public SawtoothSignalSettings() {
         freq = new JTextField("0");
         amplitude = new JTextField("0");
         approx = new JTextField("0");
-        reverseFourier = new JCheckBox(resourceBundle.getString("checkbox.reversefourier"));
+        reverseFourier = new JCheckBox(Application.getString("checkbox.reversefourier"));
         minRVal = new JTextField("0");
         maxRVal = new JTextField("0");
-        addRandom = new JCheckBox(resourceBundle.getString("checkbox.noise"));
+        addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         buildGui();
     }
 
     private void buildGui() {
-        JLabel amplitudeLabel = new JLabel(resourceBundle.getString("label.amplitude"));
-        JLabel frequencyLabel = new JLabel(resourceBundle.getString("label.frequency"));
-        JLabel approxLabel = new JLabel(resourceBundle.getString("label.approximation"));
-        JLabel minRValLabel = new JLabel(resourceBundle.getString("label.minvalue"));
-        JLabel maxRValLabel = new JLabel(resourceBundle.getString("label.maxvalue"));
+        JLabel amplitudeLabel = new JLabel(Application.getString("label.amplitude"));
+        JLabel frequencyLabel = new JLabel(Application.getString("label.frequency"));
+        JLabel approxLabel = new JLabel(Application.getString("label.approximation"));
+        JLabel minRValLabel = new JLabel(Application.getString("label.minvalue"));
+        JLabel maxRValLabel = new JLabel(Application.getString("label.maxvalue"));
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
@@ -109,6 +104,7 @@ public class SawtoothSignalSettings extends SignalSettings {
         c.anchor = GridBagConstraints.EAST;
         c.gridx = 3;
         c.gridheight = 3;
+        c.insets.left = Integer.parseInt(Application.getProperty("settings.width")) / 5;
         add(noise, c);
     }
 
@@ -134,11 +130,11 @@ public class SawtoothSignalSettings extends SignalSettings {
 
     @Override
     public String getSignalName() {
-        return resourceBundle.getString("type.sawtooth");
+        return Application.getString("type.sawtooth");
     }
 
     @Override
     public String getSignalId() {
-        return resourceBundleUS.getString("type.sawtooth");
+        return Application.getUSString("type.sawtooth");
     }
 }

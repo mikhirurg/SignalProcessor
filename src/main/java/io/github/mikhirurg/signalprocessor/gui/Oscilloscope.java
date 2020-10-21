@@ -1,21 +1,23 @@
 package io.github.mikhirurg.signalprocessor.gui;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
+import io.github.mikhirurg.signalprocessor.util.Application;
+import io.github.mikhirurg.signalprocessor.util.Cortege;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ItemEvent;
-import java.io.*;
-import java.util.Locale;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Properties;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class Oscilloscope extends JFrame {
-
-    private final Properties appProperties;
-    private final ResourceBundle resourceBundle;
-    private final ResourceBundle resourceBundleUS;
 
     private SignalSettings currentSignalASettings;
     private SignalSettings currentSignalBSettings;
@@ -27,16 +29,17 @@ public class Oscilloscope extends JFrame {
     private void createSignalSettings(JPanel signal, Display display, int signalNum, boolean update) {
         signal.removeAll();
         signal.setLayout(new GridBagLayout());
-        signal.setPreferredSize(new Dimension(Integer.parseInt(appProperties.getProperty("settings.width")), Integer.parseInt(appProperties.getProperty("settings.height"))));
+        signal.setPreferredSize(new Dimension(Integer.parseInt(Application.getProperty("settings.width")),
+                Integer.parseInt(Application.getProperty("settings.height"))));
         signal.setBorder(BorderFactory.createTitledBorder((signalNum == SIGNAL_A)
-                ? resourceBundle.getString("signal.signalA") : resourceBundle.getString("signal.signalB")));
+                ? Application.getString("signal.signalA") : Application.getString("signal.signalB")));
         JComboBox<String> comboBox = new JComboBox<>();
-        comboBox.addItem(resourceBundle.getString("type.constant"));
-        comboBox.addItem(resourceBundle.getString("type.sine"));
-        comboBox.addItem(resourceBundle.getString("type.random"));
-        comboBox.addItem(resourceBundle.getString("type.square"));
-        comboBox.addItem(resourceBundle.getString("type.sawtooth"));
-        comboBox.addItem(resourceBundle.getString("type.range"));
+        comboBox.addItem(Application.getString("type.constant"));
+        comboBox.addItem(Application.getString("type.sine"));
+        comboBox.addItem(Application.getString("type.random"));
+        comboBox.addItem(Application.getString("type.square"));
+        comboBox.addItem(Application.getString("type.sawtooth"));
+        comboBox.addItem(Application.getString("type.range"));
 
         if (update) {
             if (signalNum == SIGNAL_A) {
@@ -50,18 +53,18 @@ public class Oscilloscope extends JFrame {
         comboBox.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 SignalSettings signalSettings = currentSignalASettings;
-                if (resourceBundle.getString("type.sine").equals(comboBox.getSelectedItem())) {
-                    signalSettings = new SineSignalSettings(resourceBundle, resourceBundleUS);
-                } else if (resourceBundle.getString("type.random").equals(comboBox.getSelectedItem())) {
-                    signalSettings = new RandomSignalSettings(resourceBundle, resourceBundleUS);
-                } else if (resourceBundle.getString("type.constant").equals(comboBox.getSelectedItem())) {
-                    signalSettings = new ConstantSignalSettings(resourceBundle, resourceBundleUS);
-                } else if (resourceBundle.getString("type.square").equals(comboBox.getSelectedItem())) {
-                    signalSettings = new SquareSignalSettings(resourceBundle, resourceBundleUS);
-                } else if (resourceBundle.getString("type.range").equals(comboBox.getSelectedItem())) {
-                    signalSettings = new RangeSignalSettings(resourceBundle, resourceBundleUS);
-                } else if (resourceBundle.getString("type.sawtooth").equals(comboBox.getSelectedItem())) {
-                    signalSettings = new SawtoothSignalSettings(resourceBundle, resourceBundleUS);
+                if (Application.getString("type.sine").equals(comboBox.getSelectedItem())) {
+                    signalSettings = new SineSignalSettings();
+                } else if (Application.getString("type.random").equals(comboBox.getSelectedItem())) {
+                    signalSettings = new RandomSignalSettings();
+                } else if (Application.getString("type.constant").equals(comboBox.getSelectedItem())) {
+                    signalSettings = new ConstantSignalSettings();
+                } else if (Application.getString("type.square").equals(comboBox.getSelectedItem())) {
+                    signalSettings = new SquareSignalSettings();
+                } else if (Application.getString("type.range").equals(comboBox.getSelectedItem())) {
+                    signalSettings = new RangeSignalSettings();
+                } else if (Application.getString("type.sawtooth").equals(comboBox.getSelectedItem())) {
+                    signalSettings = new SawtoothSignalSettings();
                 }
                 if (signalNum == SIGNAL_A) {
                     settingsPanel.removeAll();
@@ -79,11 +82,11 @@ public class Oscilloscope extends JFrame {
 
         if (signalNum == SIGNAL_A) {
             if (!update)
-                currentSignalASettings = new ConstantSignalSettings(resourceBundle, resourceBundleUS);
+                currentSignalASettings = new ConstantSignalSettings();
             settingsPanel.add(currentSignalASettings);
         } else if (signalNum == SIGNAL_B) {
             if (!update)
-                currentSignalBSettings = new ConstantSignalSettings(resourceBundle, resourceBundleUS);
+                currentSignalBSettings = new ConstantSignalSettings();
             settingsPanel.add(currentSignalBSettings);
         }
 
@@ -100,7 +103,7 @@ public class Oscilloscope extends JFrame {
         sac.gridy = 1;
         signal.add(settingsPanel, sac);
 
-        sac.gridx = 2;
+        sac.gridx = 0;
         sac.gridy = 2;
         sac.gridwidth = 1;
         sac.gridheight = 1;
@@ -114,7 +117,7 @@ public class Oscilloscope extends JFrame {
             }
         }
 
-        JButton apply = new JButton(resourceBundle.getString("button.apply"));
+        JButton apply = new JButton(Application.getString("button.apply"));
         apply.addActionListener(e -> {
             try {
                 if (signalNum == SIGNAL_A) {
@@ -123,16 +126,13 @@ public class Oscilloscope extends JFrame {
                     display.setyInput(currentSignalBSettings.getSignal());
                 }
             } catch (NumberFormatException e1) {
-                JOptionPane.showMessageDialog(this, resourceBundle.getString("dialog.message"));
+                JOptionPane.showMessageDialog(this, Application.getString("dialog.message"));
             }
         });
         signal.add(apply, sac);
     }
 
-    public Oscilloscope(Properties properties, ResourceBundle resourceBundle, ResourceBundle resourceBundleUS) {
-        this.appProperties = properties;
-        this.resourceBundle = resourceBundle;
-        this.resourceBundleUS = resourceBundleUS;
+    public Oscilloscope() {
         createGui();
     }
 
@@ -140,29 +140,29 @@ public class Oscilloscope extends JFrame {
         StringBuilder builder = new StringBuilder();
         String signalName = settings.getSignalId();
         builder.append(name).append(".type = ").append(signalName).append("\n");
-        if (signalName.equals(resourceBundleUS.getString("type.sine"))) {
+        if (signalName.equals(Application.getUSString("type.sine"))) {
             SineSignalSettings sineSignalSettings = (SineSignalSettings) settings;
             builder.append(name).append(".amplitude = ").append(sineSignalSettings.getAmplitude()).append("\n")
                     .append(name).append(".freq = ").append(sineSignalSettings.getFreq()).append("\n")
                     .append(name).append(".initphase = ").append(sineSignalSettings.getInitPhase()).append("\n");
-        } else if (signalName.equals(resourceBundleUS.getString("type.constant"))) {
+        } else if (signalName.equals(Application.getUSString("type.constant"))) {
             ConstantSignalSettings constantSignalSettings = (ConstantSignalSettings) settings;
             builder.append(name).append(".val = ").append(constantSignalSettings.getVal()).append("\n");
-        } else if (signalName.equals(resourceBundleUS.getString("type.random"))) {
+        } else if (signalName.equals(Application.getUSString("type.random"))) {
             RandomSignalSettings randomSignalSettings = (RandomSignalSettings) settings;
             builder.append(name).append(".minval = ").append(randomSignalSettings.getMinVal()).append("\n")
                     .append(name).append(".maxval = ").append(randomSignalSettings.getMaxVal()).append("\n");
-        } else if (signalName.equals(resourceBundleUS.getString("type.range"))) {
+        } else if (signalName.equals(Application.getUSString("type.range"))) {
             RangeSignalSettings rangeSignalSettings = (RangeSignalSettings) settings;
             builder.append(name).append(".minval = ").append(rangeSignalSettings.getMinVal()).append("\n")
                     .append(name).append(".maxval = ").append(rangeSignalSettings.getMaxVal()).append("\n")
                     .append(name).append(".amplitude = ").append(rangeSignalSettings.getAmplitude()).append("\n");
-        } else if (signalName.equals(resourceBundleUS.getString("type.square"))) {
+        } else if (signalName.equals(Application.getUSString("type.square"))) {
             SquareSignalSettings squareSignalSettings = (SquareSignalSettings) settings;
             builder.append(name).append(".approximation = ").append(squareSignalSettings.getApprox()).append("\n")
                     .append(name).append(".cyclefrequency = ").append(squareSignalSettings.getCycleFrequency()).append("\n")
                     .append(name).append(".amplitude = ").append(squareSignalSettings.getAmplitude()).append("\n");
-        } else if (signalName.equals(resourceBundleUS.getString("type.sawtooth"))) {
+        } else if (signalName.equals(Application.getUSString("type.sawtooth"))) {
             SawtoothSignalSettings sawtoothSignalSettings = (SawtoothSignalSettings) settings;
             builder.append(name).append(".approximation = ").append(sawtoothSignalSettings.getApproximation()).append("\n")
                     .append(name).append(".cyclefrequency = ").append(sawtoothSignalSettings.getFrequency()).append("\n")
@@ -173,54 +173,47 @@ public class Oscilloscope extends JFrame {
     }
 
     private String getConfiguration() {
-        return getSignalConfiguration(currentSignalASettings, resourceBundleUS.getString("signal.signalA")) +
-                getSignalConfiguration(currentSignalBSettings, resourceBundleUS.getString("signal.signalB"));
+        return getSignalConfiguration(currentSignalASettings, Application.getUSString("signal.signalA")) +
+                getSignalConfiguration(currentSignalBSettings, Application.getUSString("signal.signalB"));
     }
 
     private SignalSettings parseSignalSettings(Properties properties, String name) {
         SignalSettings signalSettings = null;
         String type = properties.getProperty(name + ".type");
-        if (type.equals(resourceBundleUS.getString("type.sine"))) {
+        if (type.equals(Application.getUSString("type.sine"))) {
             signalSettings = new SineSignalSettings(
                     Double.parseDouble(properties.getProperty(name + ".amplitude")),
                     Double.parseDouble(properties.getProperty(name + ".freq")),
-                    Double.parseDouble(properties.getProperty(name + ".initphase")),
-                    resourceBundle, resourceBundleUS);
-        } else if (type.equals(resourceBundleUS.getString("type.constant"))) {
+                    Double.parseDouble(properties.getProperty(name + ".initphase")));
+        } else if (type.equals(Application.getUSString("type.constant"))) {
             signalSettings = new ConstantSignalSettings(
-                    Double.parseDouble(properties.getProperty(name + ".val")),
-                    resourceBundle, resourceBundleUS);
-        } else if (type.equals(resourceBundleUS.getString("type.random"))) {
+                    Double.parseDouble(properties.getProperty(name + ".val")));
+        } else if (type.equals(Application.getUSString("type.random"))) {
             signalSettings = new RandomSignalSettings(
                     Double.parseDouble(properties.getProperty(name + ".minval")),
-                    Double.parseDouble(properties.getProperty(name + ".maxval")),
-                    resourceBundle,
-                    resourceBundleUS);
-        } else if (type.equals(resourceBundleUS.getString("type.range"))) {
+                    Double.parseDouble(properties.getProperty(name + ".maxval")));
+        } else if (type.equals(Application.getString("type.range"))) {
             signalSettings = new RangeSignalSettings(
                     Double.parseDouble(properties.getProperty(name + ".minval")),
                     Double.parseDouble(properties.getProperty(name + ".maxval")),
-                    Double.parseDouble(properties.getProperty(name + ".amplitude")),
-                    resourceBundle, resourceBundleUS);
-        } else if (type.equals(resourceBundleUS.getString("type.square"))) {
+                    Double.parseDouble(properties.getProperty(name + ".amplitude")));
+        } else if (type.equals(Application.getUSString("type.square"))) {
             signalSettings = new SquareSignalSettings(
                     Double.parseDouble(properties.getProperty(name + ".cyclefrequency")),
                     Integer.parseInt(properties.getProperty(name + ".approximation")),
-                    Double.parseDouble(properties.getProperty(name + ".amplitude")),
-                    resourceBundle, resourceBundleUS);
-        } else if (type.equals(resourceBundleUS.getString("type.sawtooth"))) {
+                    Double.parseDouble(properties.getProperty(name + ".amplitude")));
+        } else if (type.equals(Application.getUSString("type.sawtooth"))) {
             signalSettings = new SawtoothSignalSettings(
                     Double.parseDouble(properties.getProperty(name + ".cyclefrequency")),
                     Double.parseDouble(properties.getProperty(name + ".amplitude")),
-                    Integer.parseInt(properties.getProperty(name + ".approximation")),
-                    resourceBundle, resourceBundleUS);
+                    Integer.parseInt(properties.getProperty(name + ".approximation")));
         }
 
         return signalSettings;
     }
 
     private void createGui() {
-        setTitle(resourceBundle.getString("title"));
+        setTitle(Application.getString("title"));
 
         try {
             UIManager.setLookAndFeel(new FlatIntelliJLaf());
@@ -236,25 +229,30 @@ public class Oscilloscope extends JFrame {
         c.gridy = 0;
         c.gridwidth = 2;
         JMenuBar menuBar = new JMenuBar();
-        JMenu file = new JMenu(resourceBundle.getString("menu.file"));
-        JMenuItem save = new JMenuItem(resourceBundle.getString("menu.file.save"));
-        JMenuItem load = new JMenuItem(resourceBundle.getString("menu.file.load"));
+        JMenu file = new JMenu(Application.getString("menu.file"));
+        JMenuItem save = new JMenuItem(Application.getString("menu.file.save"));
+        JMenuItem load = new JMenuItem(Application.getString("menu.file.load"));
         menuBar.add(file);
         file.add(save);
         file.add(load);
         pane.add(menuBar, c);
 
-        Display display = new Display(appProperties);
+        JMenu image = new JMenu(Application.getString("menu.image"));
+        JMenuItem saveImage = new JMenuItem(Application.getString("menu.image.save"));
+        menuBar.add(image);
+        image.add(saveImage);
+
+        Display display = new Display();
 
         c.gridx = 0;
         c.gridy = 1;
-        c.gridwidth = 1;
+        c.gridwidth = 4;
         c.gridheight = 3;
         pane.add(display, c);
 
         JPanel signalA = new JPanel();
         createSignalSettings(signalA, display, SIGNAL_A, false);
-        c.gridx = 1;
+        c.gridx = 4;
         c.gridy = 1;
         c.gridwidth = 5;
         c.gridheight = 1;
@@ -270,67 +268,126 @@ public class Oscilloscope extends JFrame {
 
         save.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setDialogTitle(resourceBundle.getString("menu.file.save"));
+            fileChooser.setDialogTitle(Application.getString("menu.file.save"));
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("Properties files", "properties");
+            fileChooser.setFileFilter(filter);
             int result = fileChooser.showSaveDialog(this);
             if (result == JFileChooser.APPROVE_OPTION) {
                 File selected = fileChooser.getSelectedFile();
                 try (FileWriter fileWriter = new FileWriter(selected)) {
                     fileWriter.write(getConfiguration());
                 } catch (IOException fileNotFoundException) {
-                    fileNotFoundException.printStackTrace();
+                    JOptionPane.showMessageDialog(this, Application.getString("dialog.save"));
                 }
             }
         });
 
         load.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setDialogTitle(resourceBundle.getString("menu.file.load"));
+            fileChooser.setDialogTitle(Application.getString("menu.file.load"));
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("Properties files", "properties");
+            fileChooser.setFileFilter(filter);
             int result = fileChooser.showOpenDialog(this);
             if (result == JFileChooser.APPROVE_OPTION) {
                 try {
                     Properties properties = new Properties();
                     properties.load(new FileInputStream(fileChooser.getSelectedFile()));
-                    currentSignalASettings = parseSignalSettings(properties, resourceBundleUS.getString("signal.signalA"));
-                    currentSignalBSettings = parseSignalSettings(properties, resourceBundleUS.getString("signal.signalB"));
+                    currentSignalASettings = parseSignalSettings(properties, Application.getUSString("signal.signalA"));
+                    currentSignalBSettings = parseSignalSettings(properties, Application.getUSString("signal.signalB"));
 
                     createSignalSettings(signalA, display, SIGNAL_A, true);
                     createSignalSettings(signalB, display, SIGNAL_B, true);
                     signalA.updateUI();
                     signalB.updateUI();
-                } catch (IOException exception) {
-                    exception.printStackTrace();
+                } catch (IOException | NullPointerException exception) {
+                    JOptionPane.showMessageDialog(this, Application.getString("dialog.load"));
                 }
             }
         });
 
-        JButton start = new JButton(resourceBundle.getString("button.start"));
-        start.addActionListener(e -> {
-            if (start.getText().equals(resourceBundle.getString("button.start"))) {
-                display.start();
-                start.setText(resourceBundle.getString("button.stop"));
-            } else if (start.getText().equals(resourceBundle.getString("button.stop"))) {
-                display.stop();
-                start.setText(resourceBundle.getString("button.start"));
+        saveImage.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle(Application.getString("menu.image.save"));
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG files", "png");
+            fileChooser.setFileFilter(filter);
+            int result = fileChooser.showSaveDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File selected = fileChooser.getSelectedFile();
+                Dimension dimension = display.getPreferredSize();
+                BufferedImage bufferedImage = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_ARGB);
+                display.paint(bufferedImage.getGraphics());
+                try {
+                    ImageIO.write(bufferedImage, "PNG", selected);
+                } catch (IOException exception) {
+                    JOptionPane.showMessageDialog(this, Application.getString("dialog.image.save"));
+                }
             }
         });
-        c.gridx = 3;
+
+        JButton start = new JButton(Application.getString("button.start"));
+        start.addActionListener(e -> {
+            if (start.getText().equals(Application.getString("button.start"))) {
+                display.start();
+                start.setText(Application.getString("button.stop"));
+            } else if (start.getText().equals(Application.getString("button.stop"))) {
+                display.stop();
+                start.setText(Application.getString("button.start"));
+            }
+        });
+        c.gridx = 4;
         c.gridy = 4;
         c.gridwidth = 1;
         c.gridheight = 1;
         pane.add(start, c);
 
-        JButton clear = new JButton(resourceBundle.getString("button.clear"));
+        JButton clear = new JButton(Application.getString("button.clear"));
         clear.addActionListener(e -> display.clear());
-        c.gridx = 4;
+        c.gridx = 5;
         pane.add(clear, c);
 
-        JCheckBox grid = new JCheckBox(resourceBundle.getString("checkbox.grid"));
+        JCheckBox grid = new JCheckBox(Application.getString("checkbox.grid"));
         grid.addActionListener(e -> {
             display.setGrid(grid.isSelected());
             display.repaint();
         });
         c.gridx = 0;
         pane.add(grid, c);
+
+        JCheckBox isSavingData = new JCheckBox(Application.getString("checkbox.data"));
+        isSavingData.addActionListener(e -> {
+            display.setSaving(isSavingData.isSelected());
+        });
+        c.gridx = 1;
+        pane.add(isSavingData, c);
+
+        JButton saveData = new JButton(Application.getString("button.savedata"));
+        saveData.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle(Application.getString("button.savedata"));
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV files", "csv");
+            fileChooser.setFileFilter(filter);
+            int result = fileChooser.showSaveDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File selected = fileChooser.getSelectedFile();
+                try (FileWriter fileWriter = new FileWriter(selected)) {
+                    fileWriter.write(display.getData().stream()
+                            .map(Cortege::toString)
+                            .collect(Collectors.joining("\n"))
+                    );
+                } catch (IOException fileNotFoundException) {
+                    JOptionPane.showMessageDialog(this, Application.getString("dialog.data.save"));
+                }
+            }
+        });
+        c.gridx = 2;
+        pane.add(saveData, c);
+
+        JButton clearData = new JButton(Application.getString("button.cleardata"));
+        clearData.addActionListener(e -> {
+            display.clearData();
+        });
+        c.gridx = 3;
+        pane.add(clearData, c);
 
         add(pane);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -342,15 +399,7 @@ public class Oscilloscope extends JFrame {
         setVisible(true);
     }
 
-    public static void main(String[] args) throws IOException {
-        Properties properties = new Properties();
-        try {
-            properties.load(new FileInputStream("app.properties"));
-        } catch (FileNotFoundException e) {
-            properties.load(Oscilloscope.class.getClassLoader().getResourceAsStream("app.properties"));
-        }
-        ResourceBundle resourceBundle = PropertyResourceBundle.getBundle("AppBundle");
-        ResourceBundle resourceBundleUS = PropertyResourceBundle.getBundle("AppBundle", Locale.forLanguageTag("en-us"));
-        SwingUtilities.invokeLater(() -> new Oscilloscope(properties, resourceBundle, resourceBundleUS).showGui());
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new Oscilloscope().showGui());
     }
 }
