@@ -7,19 +7,19 @@ import io.github.mikhirurg.signalprocessor.util.Application;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ResourceBundle;
 
-public class ConstantSignalSettings extends SignalSettings {
+public class ConstantSignalSettings extends SignalSettings implements Noisable {
     private final JTextField val;
     private final JCheckBox addRandom;
     private final JTextField minRVal;
     private final JTextField maxRVal;
 
-    public ConstantSignalSettings(double defVal) {
+    public ConstantSignalSettings(double defVal, double defMinRVal, double defMaxRVal, boolean noised) {
         val = new JTextField(String.valueOf(defVal));
-        minRVal = new JTextField("0");
-        maxRVal = new JTextField("0");
+        minRVal = new JTextField(String.valueOf(defMinRVal));
+        maxRVal = new JTextField(String.valueOf(defMaxRVal));
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
+        addRandom.setSelected(noised);
         buildGui();
     }
 
@@ -93,6 +93,11 @@ public class ConstantSignalSettings extends SignalSettings {
     }
 
     @Override
+    public boolean isNoised() {
+        return addRandom.isSelected();
+    }
+
+    @Override
     public String getSignalName() {
         return Application.getString("type.constant");
     }
@@ -100,5 +105,15 @@ public class ConstantSignalSettings extends SignalSettings {
     @Override
     public String getSignalId() {
         return Application.getUSString("type.constant");
+    }
+
+    @Override
+    public double getMinRVal() {
+        return Double.parseDouble(minRVal.getText());
+    }
+
+    @Override
+    public double getMaxRVal() {
+        return Double.parseDouble(maxRVal.getText());
     }
 }

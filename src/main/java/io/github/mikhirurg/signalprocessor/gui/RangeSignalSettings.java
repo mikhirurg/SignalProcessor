@@ -8,7 +8,7 @@ import io.github.mikhirurg.signalprocessor.util.Application;
 import javax.swing.*;
 import java.awt.*;
 
-public class RangeSignalSettings extends SignalSettings {
+public class RangeSignalSettings extends SignalSettings implements Noisable {
     private final JTextField minVal;
     private final JTextField maxVal;
     private final JTextField amplitude;
@@ -16,13 +16,15 @@ public class RangeSignalSettings extends SignalSettings {
     private final JTextField minRVal;
     private final JTextField maxRVal;
 
-    public RangeSignalSettings(double defMinVal, double defMaxVal, double defAmplitude) {
-        amplitude = new JTextField(String.valueOf(defMinVal));
-        minVal = new JTextField(String.valueOf(defMaxVal));
-        maxVal = new JTextField(String.valueOf(defAmplitude));
-        minRVal = new JTextField("0");
-        maxRVal = new JTextField("0");
+    public RangeSignalSettings(double defMinVal, double defMaxVal, double defAmplitude, double defMinRVal,
+                               double defMaxRVal, boolean noised) {
+        amplitude = new JTextField(String.valueOf(defAmplitude));
+        minVal = new JTextField(String.valueOf(defMinVal));
+        maxVal = new JTextField(String.valueOf(defMaxVal));
+        minRVal = new JTextField(String.valueOf(defMinRVal));
+        maxRVal = new JTextField(String.valueOf(defMaxRVal));
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
+        addRandom.setSelected(noised);
         buildGui();
     }
 
@@ -129,5 +131,20 @@ public class RangeSignalSettings extends SignalSettings {
     @Override
     public String getSignalId() {
         return Application.getUSString("type.range");
+    }
+
+    @Override
+    public double getMinRVal() {
+        return Double.parseDouble(minRVal.getText());
+    }
+
+    @Override
+    public double getMaxRVal() {
+        return Double.parseDouble(maxRVal.getText());
+    }
+
+    @Override
+    public boolean isNoised() {
+        return addRandom.isSelected();
     }
 }

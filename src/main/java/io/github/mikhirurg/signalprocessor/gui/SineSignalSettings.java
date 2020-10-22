@@ -8,7 +8,7 @@ import io.github.mikhirurg.signalprocessor.util.Application;
 import javax.swing.*;
 import java.awt.*;
 
-public class SineSignalSettings extends SignalSettings {
+public class SineSignalSettings extends SignalSettings implements Noisable {
     private final JTextField amplitude;
     private final JTextField freq;
     private final JTextField initPhase;
@@ -16,13 +16,15 @@ public class SineSignalSettings extends SignalSettings {
     private final JTextField minRVal;
     private final JTextField maxRVal;
 
-    public SineSignalSettings(double defAmplitude, double defFreq, double defInitPhase) {
+    public SineSignalSettings(double defAmplitude, double defFreq, double defInitPhase,
+                              double defMinRVal, double defMaxRVal, boolean noised) {
         amplitude = new JTextField(String.valueOf(defAmplitude));
         freq = new JTextField(String.valueOf(defFreq));
         initPhase = new JTextField(String.valueOf(defInitPhase));
-        minRVal = new JTextField("0");
-        maxRVal = new JTextField("0");
+        minRVal = new JTextField(String.valueOf(defMinRVal));
+        maxRVal = new JTextField(String.valueOf(defMaxRVal));
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
+        addRandom.setSelected(noised);
         buildGui();
     }
     public SineSignalSettings() {
@@ -126,5 +128,20 @@ public class SineSignalSettings extends SignalSettings {
     @Override
     public String getSignalId() {
         return Application.getUSString("type.sine");
+    }
+
+    @Override
+    public double getMinRVal() {
+        return Double.parseDouble(minRVal.getText());
+    }
+
+    @Override
+    public double getMaxRVal() {
+        return Double.parseDouble(maxRVal.getText());
+    }
+
+    @Override
+    public boolean isNoised() {
+        return addRandom.isSelected();
     }
 }

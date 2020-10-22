@@ -7,9 +7,8 @@ import io.github.mikhirurg.signalprocessor.util.Application;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ResourceBundle;
 
-public class SawtoothSignalSettings extends SignalSettings {
+public class SawtoothSignalSettings extends SignalSettings implements Noisable {
     private final JTextField freq;
     private final JTextField amplitude;
     private final JTextField approx;
@@ -18,14 +17,16 @@ public class SawtoothSignalSettings extends SignalSettings {
     private final JTextField minRVal;
     private final JTextField maxRVal;
 
-    public SawtoothSignalSettings(double defFreq, double defAmplitude, int defApprox) {
+    public SawtoothSignalSettings(double defFreq, double defAmplitude, int defApprox, double defMinRVal,
+                                  double defMaxRVal, boolean noised) {
         freq = new JTextField(String.valueOf(defFreq));
         amplitude = new JTextField(String.valueOf(defAmplitude));
         approx = new JTextField(String.valueOf(defApprox));
         reverseFourier = new JCheckBox(Application.getString("checkbox.reversefourier"));
-        minRVal = new JTextField("0");
-        maxRVal = new JTextField("0");
+        minRVal = new JTextField(String.valueOf(defMinRVal));
+        maxRVal = new JTextField(String.valueOf(defMaxRVal));
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
+        addRandom.setSelected(noised);
         buildGui();
     }
 
@@ -72,9 +73,9 @@ public class SawtoothSignalSettings extends SignalSettings {
         c.gridx = 1;
         add(approx, c);
 
-        c.gridx = 0;
+        /*c.gridx = 0;
         c.gridy = 3;
-        add(reverseFourier, c);
+        add(reverseFourier, c);*/
 
         JPanel noise = new JPanel();
         noise.setLayout(new GridBagLayout());
@@ -118,6 +119,19 @@ public class SawtoothSignalSettings extends SignalSettings {
 
     public int getApproximation() {
         return Integer.parseInt(approx.getText());
+    }
+
+    public double getMinRVal() {
+        return Double.parseDouble(minRVal.getText());
+    }
+
+    public double getMaxRVal() {
+        return Double.parseDouble(maxRVal.getText());
+    }
+
+    @Override
+    public boolean isNoised() {
+        return addRandom.isSelected();
     }
 
     @Override

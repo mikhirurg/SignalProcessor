@@ -1,6 +1,7 @@
 package io.github.mikhirurg.signalprocessor.gui;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
+import io.github.mikhirurg.signalprocessor.tools.FourierProcessingWindow;
 import io.github.mikhirurg.signalprocessor.util.Application;
 import io.github.mikhirurg.signalprocessor.util.Cortege;
 
@@ -169,6 +170,13 @@ public class Oscilloscope extends JFrame {
                     .append(name).append(".amplitude = ").append(sawtoothSignalSettings.getAmplitude()).append("\n");
         }
 
+        if (!signalName.equals(Application.getUSString("type.random"))) {
+            Noisable noisable = (Noisable) settings;
+            builder.append(name).append(".minrval = ").append(noisable.getMinRVal()).append("\n")
+                    .append(name).append(".maxrval = ").append(noisable.getMaxRVal()).append("\n")
+                    .append(name).append(".noised = ").append(noisable.isNoised()).append("\n");
+        }
+
         return builder.toString();
     }
 
@@ -184,29 +192,50 @@ public class Oscilloscope extends JFrame {
             signalSettings = new SineSignalSettings(
                     Double.parseDouble(properties.getProperty(name + ".amplitude")),
                     Double.parseDouble(properties.getProperty(name + ".freq")),
-                    Double.parseDouble(properties.getProperty(name + ".initphase")));
+                    Double.parseDouble(properties.getProperty(name + ".initphase")),
+                    Double.parseDouble(properties.getProperty(name + ".minrval")),
+                    Double.parseDouble(properties.getProperty(name + ".maxrval")),
+                    Boolean.parseBoolean(properties.getProperty(name + ".noised"))
+                    );
         } else if (type.equals(Application.getUSString("type.constant"))) {
             signalSettings = new ConstantSignalSettings(
-                    Double.parseDouble(properties.getProperty(name + ".val")));
+                    Double.parseDouble(properties.getProperty(name + ".val")),
+                    Double.parseDouble(properties.getProperty(name + ".minrval")),
+                    Double.parseDouble(properties.getProperty(name + ".maxrval")),
+                    Boolean.parseBoolean(properties.getProperty(name + ".noised"))
+            );
         } else if (type.equals(Application.getUSString("type.random"))) {
             signalSettings = new RandomSignalSettings(
                     Double.parseDouble(properties.getProperty(name + ".minval")),
-                    Double.parseDouble(properties.getProperty(name + ".maxval")));
-        } else if (type.equals(Application.getString("type.range"))) {
+                    Double.parseDouble(properties.getProperty(name + ".maxval"))
+            );
+        } else if (type.equals(Application.getUSString("type.range"))) {
             signalSettings = new RangeSignalSettings(
                     Double.parseDouble(properties.getProperty(name + ".minval")),
                     Double.parseDouble(properties.getProperty(name + ".maxval")),
-                    Double.parseDouble(properties.getProperty(name + ".amplitude")));
+                    Double.parseDouble(properties.getProperty(name + ".amplitude")),
+                    Double.parseDouble(properties.getProperty(name + ".minrval")),
+                    Double.parseDouble(properties.getProperty(name + ".maxrval")),
+                    Boolean.parseBoolean(properties.getProperty(name + ".noised"))
+            );
         } else if (type.equals(Application.getUSString("type.square"))) {
             signalSettings = new SquareSignalSettings(
                     Double.parseDouble(properties.getProperty(name + ".cyclefrequency")),
                     Integer.parseInt(properties.getProperty(name + ".approximation")),
-                    Double.parseDouble(properties.getProperty(name + ".amplitude")));
+                    Double.parseDouble(properties.getProperty(name + ".amplitude")),
+                    Double.parseDouble(properties.getProperty(name + ".minrval")),
+                    Double.parseDouble(properties.getProperty(name + ".maxrval")),
+                    Boolean.parseBoolean(properties.getProperty(name + ".noised"))
+            );
         } else if (type.equals(Application.getUSString("type.sawtooth"))) {
             signalSettings = new SawtoothSignalSettings(
                     Double.parseDouble(properties.getProperty(name + ".cyclefrequency")),
                     Double.parseDouble(properties.getProperty(name + ".amplitude")),
-                    Integer.parseInt(properties.getProperty(name + ".approximation")));
+                    Integer.parseInt(properties.getProperty(name + ".approximation")),
+                    Double.parseDouble(properties.getProperty(name + ".minrval")),
+                    Double.parseDouble(properties.getProperty(name + ".maxrval")),
+                    Boolean.parseBoolean(properties.getProperty(name + ".noised"))
+            );
         }
 
         return signalSettings;
@@ -242,8 +271,12 @@ public class Oscilloscope extends JFrame {
         menuBar.add(image);
         image.add(saveImage);
 
-        Display display = new Display();
+        JMenu tools = new JMenu(Application.getString("menu.tools"));
+        JMenuItem fourier = new JMenuItem(Application.getString("menu.tools.fourier"));
+        menuBar.add(tools);
+        tools.add(fourier);
 
+        Display display = new Display();
         c.gridx = 0;
         c.gridy = 1;
         c.gridwidth = 4;
@@ -322,6 +355,12 @@ public class Oscilloscope extends JFrame {
                     JOptionPane.showMessageDialog(this, Application.getString("dialog.image.save"));
                 }
             }
+        });
+
+        FourierProcessingWindow fourierProcessingWindow = new FourierProcessingWindow(display);
+
+        fourier.addActionListener(e -> {
+            fourierProcessingWindow.setVisible(true);
         });
 
         JButton start = new JButton(Application.getString("button.start"));

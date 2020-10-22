@@ -8,7 +8,7 @@ import io.github.mikhirurg.signalprocessor.util.Application;
 import javax.swing.*;
 import java.awt.*;
 
-public class SquareSignalSettings extends SignalSettings {
+public class SquareSignalSettings extends SignalSettings implements Noisable {
     private final JTextField amplitude;
     private final JTextField frequency;
     private final JTextField approx;
@@ -17,14 +17,16 @@ public class SquareSignalSettings extends SignalSettings {
     private final JTextField minRVal;
     private final JTextField maxRVal;
 
-    public SquareSignalSettings(double defCycleFreq, int defApprox, double defAmplitude) {
+    public SquareSignalSettings(double defCycleFreq, int defApprox, double defAmplitude, double defMinRVal,
+                                double defMaxRVal, boolean noised) {
         frequency = new JTextField(String.valueOf(defCycleFreq));
         approx = new JTextField(String.valueOf(defApprox));
         amplitude = new JTextField(String.valueOf(defAmplitude));
         reverseFourier = new JCheckBox(Application.getString("checkbox.reversefourier"));
-        minRVal = new JTextField("0");
-        maxRVal = new JTextField("0");
+        minRVal = new JTextField(String.valueOf(defMinRVal));
+        maxRVal = new JTextField(String.valueOf(defMaxRVal));
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
+        addRandom.setSelected(noised);
         buildGui();
     }
 
@@ -37,36 +39,6 @@ public class SquareSignalSettings extends SignalSettings {
         maxRVal = new JTextField("0");
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         buildGui();
-    }
-
-    public int getApprox() {
-        return Integer.parseInt(approx.getText());
-    }
-
-    public double getCycleFrequency() {
-        return Double.parseDouble(frequency.getText());
-    }
-
-    public double getAmplitude() {
-        return Double.parseDouble(amplitude.getText());
-    }
-
-    @Override
-    public Signal getSignal() {
-        return new SquareSignal(getAmplitude(), getCycleFrequency(), getApprox(), reverseFourier.isSelected(), addRandom.isSelected(), new RandomSignal(
-                Double.parseDouble(minRVal.getText()),
-                Double.parseDouble(maxRVal.getText()))
-        );
-    }
-
-    @Override
-    public String getSignalName() {
-        return Application.getString("type.sine");
-    }
-
-    @Override
-    public String getSignalId() {
-        return Application.getUSString("type.sine");
     }
 
     private void buildGui() {
@@ -102,9 +74,9 @@ public class SquareSignalSettings extends SignalSettings {
         c.gridx = 1;
         add(approx, c);
 
-        c.gridx = 0;
+        /*c.gridx = 0;
         c.gridy = 3;
-        add(reverseFourier, c);
+        add(reverseFourier, c);*/
 
         JPanel noise = new JPanel();
         noise.setLayout(new GridBagLayout());
@@ -136,5 +108,50 @@ public class SquareSignalSettings extends SignalSettings {
         c.gridheight = 3;
         c.insets.left = Integer.parseInt(Application.getProperty("settings.width")) / 5;
         add(noise, c);
+    }
+
+    @Override
+    public Signal getSignal() {
+        return new SquareSignal(getAmplitude(), getCycleFrequency(), getApprox(), reverseFourier.isSelected(), addRandom.isSelected(), new RandomSignal(
+                Double.parseDouble(minRVal.getText()),
+                Double.parseDouble(maxRVal.getText()))
+        );
+    }
+
+    public int getApprox() {
+        return Integer.parseInt(approx.getText());
+    }
+
+    public double getCycleFrequency() {
+        return Double.parseDouble(frequency.getText());
+    }
+
+    public double getAmplitude() {
+        return Double.parseDouble(amplitude.getText());
+    }
+
+    @Override
+    public String getSignalName() {
+        return Application.getString("type.square");
+    }
+
+    @Override
+    public String getSignalId() {
+        return Application.getUSString("type.square");
+    }
+
+    @Override
+    public boolean isNoised() {
+        return addRandom.isSelected();
+    }
+
+    @Override
+    public double getMinRVal() {
+        return Double.parseDouble(minRVal.getText());
+    }
+
+    @Override
+    public double getMaxRVal() {
+        return Double.parseDouble(maxRVal.getText());
     }
 }

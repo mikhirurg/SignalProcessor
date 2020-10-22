@@ -22,10 +22,10 @@ public class SawtoothSignal implements Signal {
         double result = 0;
 
         for (int k = 1; k < approx; k++) {
-            result += (Math.pow(-1, k) * Math.sin(2 * Math.PI * k * freq * t) / k);
+            result += - (Math.pow(-1, k) * Math.sin(2 * Math.PI * k * freq * t) / k);
         }
 
-        result = amplitude / 2 - amplitude / Math.PI * result;
+        result = 2 * amplitude / Math.PI * result;
 
         return addRandom ? result + randomSignal.generateValue(t) : result;
     }
