@@ -13,10 +13,10 @@ public class FourierProcessor {
     public static List<ComplexNumber> getFourierProcessing(List<Cortege<Double>> data, int signal) {
         List<ComplexNumber> result = new LinkedList<>();
         int N = data.size();
-        for (int k = 0; k < N; k++) {
+        for (int k = 0; k < N / 2; k++) {
             ComplexNumber Xk = new ComplexNumber(0, 0);
             for (int n = 0; n < N; n++) {
-                Xk = Xk.plus(new ComplexNumber(Math.cos(2 * Math.PI * k * n / N), Math.sin(2 * Math.PI * k * n / N)).mul(signal == 0 ? data.get(n).getSecond() : data.get(n).getThird()));
+                Xk = Xk.plus(new ComplexNumber(Math.cos(2 * Math.PI * k * n / N), - Math.sin(2 * Math.PI * k * n / N)).mul(signal == 0 ? data.get(n).getSecond() : data.get(n).getThird()));
             }
             result.add(Xk);
         }

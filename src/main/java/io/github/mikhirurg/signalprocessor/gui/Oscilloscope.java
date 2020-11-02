@@ -196,7 +196,7 @@ public class Oscilloscope extends JFrame {
                     Double.parseDouble(properties.getProperty(name + ".minrval")),
                     Double.parseDouble(properties.getProperty(name + ".maxrval")),
                     Boolean.parseBoolean(properties.getProperty(name + ".noised"))
-                    );
+            );
         } else if (type.equals(Application.getUSString("type.constant"))) {
             signalSettings = new ConstantSignalSettings(
                     Double.parseDouble(properties.getProperty(name + ".val")),
@@ -280,7 +280,7 @@ public class Oscilloscope extends JFrame {
         c.gridx = 0;
         c.gridy = 1;
         c.gridwidth = 4;
-        c.gridheight = 3;
+        c.gridheight = 8;
         pane.add(display, c);
 
         JPanel signalA = new JPanel();
@@ -358,46 +358,53 @@ public class Oscilloscope extends JFrame {
         });
 
         FourierProcessingWindow fourierProcessingWindow = new FourierProcessingWindow(display);
-
-        fourier.addActionListener(e -> {
-            fourierProcessingWindow.setVisible(true);
-        });
-
-        JButton start = new JButton(Application.getString("button.start"));
-        start.addActionListener(e -> {
-            if (start.getText().equals(Application.getString("button.start"))) {
-                display.start();
-                start.setText(Application.getString("button.stop"));
-            } else if (start.getText().equals(Application.getString("button.stop"))) {
-                display.stop();
-                start.setText(Application.getString("button.start"));
-            }
-        });
-        c.gridx = 4;
-        c.gridy = 4;
-        c.gridwidth = 1;
-        c.gridheight = 1;
-        pane.add(start, c);
-
-        JButton clear = new JButton(Application.getString("button.clear"));
-        clear.addActionListener(e -> display.clear());
-        c.gridx = 5;
-        pane.add(clear, c);
+        fourier.addActionListener(e -> fourierProcessingWindow.setVisible(true));
 
         JCheckBox grid = new JCheckBox(Application.getString("checkbox.grid"));
         grid.addActionListener(e -> {
             display.setGrid(grid.isSelected());
             display.repaint();
         });
-        c.gridx = 0;
+        c.gridx = 4;
+        c.gridy = 3;
+        c.gridwidth = 1;
+        c.gridheight = 1;
+        c.insets.left = Integer.parseInt(Application.getProperty("settings.xinset"));
+        c.anchor = GridBagConstraints.NORTHWEST;
         pane.add(grid, c);
 
+        JLabel array = new JLabel(Application.getString("textarea.array") + " (" + display.getData().size() + ")");
+        c.gridx = 6;
+        c.gridy = 3;
+        pane.add(array, c);
+
         JCheckBox isSavingData = new JCheckBox(Application.getString("checkbox.data"));
-        isSavingData.addActionListener(e -> {
-            display.setSaving(isSavingData.isSelected());
-        });
-        c.gridx = 1;
+        isSavingData.addActionListener(e -> display.setSaving(isSavingData.isSelected()));
+        c.gridx = 4;
+        c.gridy = 4;
+        c.insets.top = Integer.parseInt(Application.getProperty("settings.yinset"));
         pane.add(isSavingData, c);
+
+
+        JTextArea textArea = new JTextArea();
+        textArea.setText(display.getData().stream().map(e ->
+                e.toString().replaceAll(",", " : "))
+                        .collect(Collectors.joining("\n")));
+
+        textArea.setRows(8);
+        textArea.setColumns(20);
+        textArea.setEditable(false);
+        display.getTimer().addActionListener(e -> {
+            textArea.setText( display.getData().stream().map(e1 ->
+                e1.toString().replaceAll(",", " : "))
+                        .collect(Collectors.joining("\n")));
+            array.setText(Application.getString("textarea.array") + " (" + display.getData().size() + ")");
+        });
+
+        c.gridx = 6;
+        c.gridy = 4;
+        c.gridheight = 5;
+        pane.add(new JScrollPane(textArea), c);
 
         JButton saveData = new JButton(Application.getString("button.savedata"));
         saveData.addActionListener(e -> {
@@ -418,15 +425,40 @@ public class Oscilloscope extends JFrame {
                 }
             }
         });
-        c.gridx = 2;
+        c.gridx = 4;
+        c.gridy = 6;
+        c.gridheight = 1;
         pane.add(saveData, c);
 
         JButton clearData = new JButton(Application.getString("button.cleardata"));
         clearData.addActionListener(e -> {
             display.clearData();
+            textArea.setText("");
+            array.setText(Application.getString("textarea.array") + " (" + display.getData().size() + ")");
         });
-        c.gridx = 3;
+        c.gridx = 4;
+        c.gridy = 7;
         pane.add(clearData, c);
+
+        JButton start = new JButton(Application.getString("button.start"));
+        start.addActionListener(e -> {
+            if (start.getText().equals(Application.getString("button.start"))) {
+                display.start();
+                start.setText(Application.getString("button.stop"));
+            } else if (start.getText().equals(Application.getString("button.stop"))) {
+                display.stop();
+                start.setText(Application.getString("button.start"));
+            }
+        });
+        c.anchor = GridBagConstraints.SOUTHWEST;
+        c.gridx = 4;
+        c.gridy = 8;
+        pane.add(start, c);
+
+        JButton clear = new JButton(Application.getString("button.clear"));
+        clear.addActionListener(e -> display.clear());
+        c.gridx = 5;
+        pane.add(clear, c);
 
         add(pane);
         setDefaultCloseOperation(EXIT_ON_CLOSE);

@@ -19,14 +19,12 @@ import java.util.stream.Collectors;
 
 public class FourierProcessingWindow extends JFrame {
     private final FourierPanel graph;
-    private final Display display;
     private List<ComplexNumber> data;
 
     public FourierProcessingWindow(Display display) {
         setTitle(Application.getString("menu.tools.fourier"));
         graph = new FourierPanel();
         data = new LinkedList<>();
-        this.display = display;
         int width = Integer.parseInt(Application.getProperty("display.width"));
         int height = Integer.parseInt(Application.getProperty("display.height"));
         graph.setPreferredSize(new Dimension(width, height));

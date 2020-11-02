@@ -1,6 +1,5 @@
 package io.github.mikhirurg.signalprocessor.tools;
 
-import io.github.mikhirurg.signalprocessor.gui.Display;
 import io.github.mikhirurg.signalprocessor.util.Application;
 import io.github.mikhirurg.signalprocessor.util.ComplexNumber;
 import io.github.mikhirurg.signalprocessor.util.Cortege;
@@ -18,15 +17,16 @@ public class FourierPanel extends JPanel {
     public FourierPanel() {
         signalData = new LinkedList<>();
         data = new LinkedList<>();
-        new Timer(50, e -> {
-            repaint();
-        });
+        new Timer(50, e -> repaint());
     }
 
     public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         int width = Integer.parseInt(Application.getProperty("display.width"));
         int height = Integer.parseInt(Application.getProperty("display.height"));
+        int stepx = Integer.parseInt(Application.getProperty("fourier.stepx"));
+        int stepy = Integer.parseInt(Application.getProperty("fourier.stepy"));
+
         if (signalData.size() > 0 && data.size() > 0) {
             double T = signalData.get(signalData.size() - 1).getFirst();
             g2d.setColor(Color.BLACK);
@@ -34,9 +34,29 @@ public class FourierPanel extends JPanel {
             g2d.setColor(Color.WHITE);
             double maxY = data.stream().max((e1, e2) -> (int) (e1.getABS() - e2.getABS())).orElseThrow().getABS();
             double maxX = IntStream.range(0, data.size()).mapToDouble(e1 -> e1 / T * width).max().orElse(0);
+
+            int xOffset = g2d.getFontMetrics().stringWidth(String.format("%.1f", maxY));
+            int yOffset = g2d.getFontMetrics().getHeight() * 2;
+
             for (int i = 0; i < data.size(); i++) {
                 double v = ((i / T) * width) / maxX * width;
-                g2d.drawLine((int) v, height, (int) v, (int) (height - data.get(i).getABS() / maxY * height));
+                g2d.drawLine((int) v + xOffset, height - yOffset, (int) v + xOffset, (int) (height - data.get(i).getABS() / maxY * height - yOffset));
+            }
+
+            for (int x = 0; x < width; x++) {
+                double v = x * maxX / width;
+                if (x % stepx == 0) {
+                    String text = String.format("%.1f", v);
+                    g2d.drawString(text, x + g2d.getFontMetrics().stringWidth(text) / 2, height - yOffset / 2);
+                }
+            }
+
+            for (int y = 0; y < height; y++) {
+                double v = y * maxY / height;
+                if (y % stepy == 0 && y > 0) {
+                    String text = String.format("%.1f", v);
+                    g2d.drawString(text, 0, height - y - yOffset / 2);
+                }
             }
         }
     }

@@ -13,26 +13,24 @@ public class SineSignalSettings extends SignalSettings implements Noisable {
     private final JTextField freq;
     private final JTextField initPhase;
     private final JCheckBox addRandom;
-    private final JTextField minRVal;
-    private final JTextField maxRVal;
+    private final RandomSignalSettings randSettings;
 
     public SineSignalSettings(double defAmplitude, double defFreq, double defInitPhase,
                               double defMinRVal, double defMaxRVal, boolean noised) {
         amplitude = new JTextField(String.valueOf(defAmplitude));
         freq = new JTextField(String.valueOf(defFreq));
         initPhase = new JTextField(String.valueOf(defInitPhase));
-        minRVal = new JTextField(String.valueOf(defMinRVal));
-        maxRVal = new JTextField(String.valueOf(defMaxRVal));
+        randSettings = new RandomSignalSettings(defMinRVal, defMaxRVal);
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         addRandom.setSelected(noised);
         buildGui();
     }
+
     public SineSignalSettings() {
         amplitude = new JTextField("0");
         freq = new JTextField("0");
         initPhase = new JTextField("0");
-        minRVal = new JTextField("0");
-        maxRVal = new JTextField("0");
+        randSettings = new RandomSignalSettings();
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         buildGui();
     }
@@ -40,8 +38,6 @@ public class SineSignalSettings extends SignalSettings implements Noisable {
     private void buildGui() {
         JLabel amplitudeLabel = new JLabel(Application.getString("label.amplitude"));
         JLabel freqLabel = new JLabel(Application.getString("label.frequency"));
-        JLabel minRValLabel = new JLabel(Application.getString("label.minvalue"));
-        JLabel maxRValLabel = new JLabel(Application.getString("label.maxvalue"));
         JLabel initPhaseLabel = new JLabel(Application.getString("label.initphase"));
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -80,17 +76,7 @@ public class SineSignalSettings extends SignalSettings implements Noisable {
 
         nc.gridwidth = 1;
         nc.gridy = 1;
-        noise.add(minRValLabel, nc);
-
-        nc.gridx = 1;
-        noise.add(minRVal, nc);
-
-        nc.gridy = 2;
-        nc.gridx = 0;
-        noise.add(maxRValLabel, nc);
-
-        nc.gridx = 1;
-        noise.add(maxRVal, nc);
+        noise.add(randSettings, nc);
 
         c.gridy = 0;
         c.anchor = GridBagConstraints.EAST;
@@ -114,10 +100,8 @@ public class SineSignalSettings extends SignalSettings implements Noisable {
 
     @Override
     public Signal getSignal() {
-        return new SineSignal(getAmplitude(), getFreq(), getInitPhase(), addRandom.isSelected(), new RandomSignal(
-                Double.parseDouble(minRVal.getText()),
-                Double.parseDouble(maxRVal.getText()))
-        );
+        return new SineSignal(getAmplitude(), getFreq(), getInitPhase(), addRandom.isSelected(),
+                (RandomSignal) randSettings.getSignal());
     }
 
     @Override
@@ -132,12 +116,12 @@ public class SineSignalSettings extends SignalSettings implements Noisable {
 
     @Override
     public double getMinRVal() {
-        return Double.parseDouble(minRVal.getText());
+        return randSettings.getMinVal();
     }
 
     @Override
     public double getMaxRVal() {
-        return Double.parseDouble(maxRVal.getText());
+        return randSettings.getMaxVal();
     }
 
     @Override

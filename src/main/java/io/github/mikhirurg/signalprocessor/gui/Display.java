@@ -41,9 +41,7 @@ public class Display extends JPanel {
         setPreferredSize(new Dimension(width, height));
 
         setBackground(Color.BLACK);
-        timer = new Timer(10, e -> {
-            repaint();
-        });
+        timer = new Timer(10, e -> repaint());
 
         image = new DisplayImage(
                 width,
@@ -112,6 +110,10 @@ public class Display extends JPanel {
         everRun = true;
         startTime = System.currentTimeMillis();
         timer.start();
+    }
+
+    public Timer getTimer() {
+        return timer;
     }
 
     public void stop() {

@@ -14,8 +14,8 @@ public class SawtoothSignalSettings extends SignalSettings implements Noisable {
     private final JTextField approx;
     private final JCheckBox reverseFourier;
     private final JCheckBox addRandom;
-    private final JTextField minRVal;
-    private final JTextField maxRVal;
+    private final RandomSignalSettings randSettings;
+
 
     public SawtoothSignalSettings(double defFreq, double defAmplitude, int defApprox, double defMinRVal,
                                   double defMaxRVal, boolean noised) {
@@ -23,8 +23,7 @@ public class SawtoothSignalSettings extends SignalSettings implements Noisable {
         amplitude = new JTextField(String.valueOf(defAmplitude));
         approx = new JTextField(String.valueOf(defApprox));
         reverseFourier = new JCheckBox(Application.getString("checkbox.reversefourier"));
-        minRVal = new JTextField(String.valueOf(defMinRVal));
-        maxRVal = new JTextField(String.valueOf(defMaxRVal));
+        randSettings = new RandomSignalSettings(defMinRVal, defMaxRVal);
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         addRandom.setSelected(noised);
         buildGui();
@@ -35,8 +34,7 @@ public class SawtoothSignalSettings extends SignalSettings implements Noisable {
         amplitude = new JTextField("0");
         approx = new JTextField("0");
         reverseFourier = new JCheckBox(Application.getString("checkbox.reversefourier"));
-        minRVal = new JTextField("0");
-        maxRVal = new JTextField("0");
+        randSettings = new RandomSignalSettings();
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         buildGui();
     }
@@ -45,8 +43,6 @@ public class SawtoothSignalSettings extends SignalSettings implements Noisable {
         JLabel amplitudeLabel = new JLabel(Application.getString("label.amplitude"));
         JLabel frequencyLabel = new JLabel(Application.getString("label.frequency"));
         JLabel approxLabel = new JLabel(Application.getString("label.approximation"));
-        JLabel minRValLabel = new JLabel(Application.getString("label.minvalue"));
-        JLabel maxRValLabel = new JLabel(Application.getString("label.maxvalue"));
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
@@ -89,17 +85,7 @@ public class SawtoothSignalSettings extends SignalSettings implements Noisable {
 
         nc.gridwidth = 1;
         nc.gridy = 1;
-        noise.add(minRValLabel, nc);
-
-        nc.gridx = 1;
-        noise.add(minRVal, nc);
-
-        nc.gridy = 2;
-        nc.gridx = 0;
-        noise.add(maxRValLabel, nc);
-
-        nc.gridx = 1;
-        noise.add(maxRVal, nc);
+        noise.add(randSettings, nc);
 
         c.gridy = 0;
         c.anchor = GridBagConstraints.EAST;
@@ -122,11 +108,11 @@ public class SawtoothSignalSettings extends SignalSettings implements Noisable {
     }
 
     public double getMinRVal() {
-        return Double.parseDouble(minRVal.getText());
+        return randSettings.getMinVal();
     }
 
     public double getMaxRVal() {
-        return Double.parseDouble(maxRVal.getText());
+        return randSettings.getMaxVal();
     }
 
     @Override
@@ -136,10 +122,8 @@ public class SawtoothSignalSettings extends SignalSettings implements Noisable {
 
     @Override
     public Signal getSignal() {
-        return new SawtoothSignal(getFrequency(), getAmplitude(), getApproximation(), reverseFourier.isSelected(), addRandom.isSelected(), new RandomSignal(
-                Double.parseDouble(minRVal.getText()),
-                Double.parseDouble(maxRVal.getText()))
-        );
+        return new SawtoothSignal(getFrequency(), getAmplitude(), getApproximation(), reverseFourier.isSelected(),
+                addRandom.isSelected(), (RandomSignal) randSettings.getSignal());
     }
 
     @Override

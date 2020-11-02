@@ -11,13 +11,11 @@ import java.awt.*;
 public class ConstantSignalSettings extends SignalSettings implements Noisable {
     private final JTextField val;
     private final JCheckBox addRandom;
-    private final JTextField minRVal;
-    private final JTextField maxRVal;
+    private final RandomSignalSettings randSettings;
 
     public ConstantSignalSettings(double defVal, double defMinRVal, double defMaxRVal, boolean noised) {
         val = new JTextField(String.valueOf(defVal));
-        minRVal = new JTextField(String.valueOf(defMinRVal));
-        maxRVal = new JTextField(String.valueOf(defMaxRVal));
+        randSettings = new RandomSignalSettings(defMinRVal, defMaxRVal);
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         addRandom.setSelected(noised);
         buildGui();
@@ -25,16 +23,13 @@ public class ConstantSignalSettings extends SignalSettings implements Noisable {
 
     public ConstantSignalSettings() {
         val = new JTextField("0");
-        minRVal = new JTextField("0");
-        maxRVal = new JTextField("0");
+        randSettings = new RandomSignalSettings();
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         buildGui();
     }
 
     private void buildGui() {
         JLabel valLabel = new JLabel(Application.getString("label.value"));
-        JLabel minRValLabel = new JLabel(Application.getString("label.minvalue"));
-        JLabel maxRValLabel = new JLabel(Application.getString("label.maxvalue"));
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.EAST;
@@ -60,17 +55,7 @@ public class ConstantSignalSettings extends SignalSettings implements Noisable {
 
         nc.gridwidth = 1;
         nc.gridy = 1;
-        noise.add(minRValLabel, nc);
-
-        nc.gridx = 1;
-        noise.add(minRVal, nc);
-
-        nc.gridy = 2;
-        nc.gridx = 0;
-        noise.add(maxRValLabel, nc);
-
-        nc.gridx = 1;
-        noise.add(maxRVal, nc);
+        noise.add(randSettings, nc);
 
         c.gridy = 0;
         c.anchor = GridBagConstraints.EAST;
@@ -86,10 +71,7 @@ public class ConstantSignalSettings extends SignalSettings implements Noisable {
 
     @Override
     public Signal getSignal() {
-        return new ConstantSignal(getVal(), addRandom.isSelected(), new RandomSignal(
-                Double.parseDouble(minRVal.getText()),
-                Double.parseDouble(maxRVal.getText())
-        ));
+        return new ConstantSignal(getVal(), addRandom.isSelected(), (RandomSignal) randSettings.getSignal());
     }
 
     @Override
@@ -109,11 +91,11 @@ public class ConstantSignalSettings extends SignalSettings implements Noisable {
 
     @Override
     public double getMinRVal() {
-        return Double.parseDouble(minRVal.getText());
+        return randSettings.getMinVal();
     }
 
     @Override
     public double getMaxRVal() {
-        return Double.parseDouble(maxRVal.getText());
+        return randSettings.getMaxVal();
     }
 }

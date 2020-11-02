@@ -13,16 +13,14 @@ public class RangeSignalSettings extends SignalSettings implements Noisable {
     private final JTextField maxVal;
     private final JTextField amplitude;
     private final JCheckBox addRandom;
-    private final JTextField minRVal;
-    private final JTextField maxRVal;
+    private final RandomSignalSettings randSettings;
 
     public RangeSignalSettings(double defMinVal, double defMaxVal, double defAmplitude, double defMinRVal,
                                double defMaxRVal, boolean noised) {
         amplitude = new JTextField(String.valueOf(defAmplitude));
         minVal = new JTextField(String.valueOf(defMinVal));
         maxVal = new JTextField(String.valueOf(defMaxVal));
-        minRVal = new JTextField(String.valueOf(defMinRVal));
-        maxRVal = new JTextField(String.valueOf(defMaxRVal));
+        randSettings = new RandomSignalSettings(defMinRVal, defMaxRVal);
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         addRandom.setSelected(noised);
         buildGui();
@@ -32,8 +30,7 @@ public class RangeSignalSettings extends SignalSettings implements Noisable {
         amplitude = new JTextField("0");
         minVal = new JTextField("0");
         maxVal = new JTextField("0");
-        minRVal = new JTextField("0");
-        maxRVal = new JTextField("0");
+        randSettings = new RandomSignalSettings();
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         buildGui();
     }
@@ -42,8 +39,6 @@ public class RangeSignalSettings extends SignalSettings implements Noisable {
         JLabel amplitudeLabel = new JLabel(Application.getString("label.amplitude"));
         JLabel minValLabel = new JLabel(Application.getString("label.minvalue"));
         JLabel maxValLabel = new JLabel(Application.getString("label.maxvalue"));
-        JLabel minRValLabel = new JLabel(Application.getString("label.minvalue"));
-        JLabel maxRValLabel = new JLabel(Application.getString("label.maxvalue"));
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
@@ -83,17 +78,7 @@ public class RangeSignalSettings extends SignalSettings implements Noisable {
 
         nc.gridwidth = 1;
         nc.gridy = 1;
-        noise.add(minRValLabel, nc);
-
-        nc.gridx = 1;
-        noise.add(minRVal, nc);
-
-        nc.gridy = 2;
-        nc.gridx = 0;
-        noise.add(maxRValLabel, nc);
-
-        nc.gridx = 1;
-        noise.add(maxRVal, nc);
+        noise.add(randSettings, nc);
 
         c.gridy = 0;
         c.anchor = GridBagConstraints.EAST;
@@ -117,10 +102,8 @@ public class RangeSignalSettings extends SignalSettings implements Noisable {
 
     @Override
     public Signal getSignal() {
-        return new RangeSignal(getMinVal(), getMaxVal(), getAmplitude(), addRandom.isSelected(), new RandomSignal(
-                Double.parseDouble(minRVal.getText()),
-                Double.parseDouble(maxRVal.getText()))
-        );
+        return new RangeSignal(getMinVal(), getMaxVal(), getAmplitude(), addRandom.isSelected(),
+                (RandomSignal) randSettings.getSignal());
     }
 
     @Override
@@ -135,12 +118,12 @@ public class RangeSignalSettings extends SignalSettings implements Noisable {
 
     @Override
     public double getMinRVal() {
-        return Double.parseDouble(minRVal.getText());
+        return randSettings.getMinVal();
     }
 
     @Override
     public double getMaxRVal() {
-        return Double.parseDouble(maxRVal.getText());
+        return randSettings.getMaxVal();
     }
 
     @Override

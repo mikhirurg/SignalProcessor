@@ -13,6 +13,7 @@ public class Application {
     private static final Properties appProperties;
     private static final ResourceBundle resourceBundle;
     private static final ResourceBundle resourceBundleUS;
+
     static {
         Properties properties = new Properties();
         try {
