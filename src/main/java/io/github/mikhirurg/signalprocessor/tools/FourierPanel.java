@@ -43,11 +43,12 @@ public class FourierPanel extends JPanel {
                 g2d.drawLine((int) v + xOffset, height - yOffset, (int) v + xOffset, (int) (height - data.get(i).getABS() / maxY * height - yOffset));
             }
 
-            for (int x = 0; x < width; x++) {
-                double v = x * maxX / width;
+            for (int x = 0; x < data.size(); x++) {
+                double v = x / T;
                 if (x % stepx == 0) {
-                    String text = String.format("%.1f", v);
-                    g2d.drawString(text, x + g2d.getFontMetrics().stringWidth(text) / 2, height - yOffset / 2);
+                    String text = String.format("%.3f", v);
+                    double xVal = ((x / T) * width) / maxX * width;
+                    g2d.drawString(text, (float) (xVal + g2d.getFontMetrics().stringWidth(text) / 2), height - yOffset / 2.0f);
                 }
             }
 
