@@ -5,20 +5,20 @@ public class RangeSignal implements Signal {
     private final double maxVal;
     private final double amplitude;
     private final boolean addRandom;
-    private final RandomSignal randomSignal;
+    private final Signal noiseSignal;
 
 
-    public RangeSignal(double minVal, double maxVal, double amplitude, boolean addRandom, RandomSignal randomSignal) {
+    public RangeSignal(double minVal, double maxVal, double amplitude, boolean addRandom, Signal noiseSignal) {
         this.minVal = minVal;
         this.maxVal = maxVal;
         this.amplitude = amplitude;
         this.addRandom = addRandom;
-        this.randomSignal = randomSignal;
+        this.noiseSignal = noiseSignal;
     }
 
     @Override
     public double generateValue(double t) {
         double result = ((t * amplitude) % (maxVal - minVal)) + minVal;
-        return addRandom ? result + randomSignal.generateValue(t) : result;
+        return addRandom ? result + noiseSignal.generateValue(t) : result;
     }
 }

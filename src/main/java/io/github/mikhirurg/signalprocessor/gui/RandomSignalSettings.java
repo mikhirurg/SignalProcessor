@@ -66,6 +66,6 @@ public class RandomSignalSettings extends SignalSettings {
 
     @Override
     public String getSignalId() {
-        return Application.getString("type.random");
+        return Application.getUSString("type.random");
     }
 }

@@ -1,6 +1,5 @@
 package io.github.mikhirurg.signalprocessor.gui;
 
-import io.github.mikhirurg.signalprocessor.math.RandomSignal;
 import io.github.mikhirurg.signalprocessor.math.Signal;
 import io.github.mikhirurg.signalprocessor.math.SquareSignal;
 import io.github.mikhirurg.signalprocessor.util.Application;
@@ -14,17 +13,17 @@ public class SquareSignalSettings extends SignalSettings implements Noisable {
     private final JTextField approx;
     private final JCheckBox reverseFourier;
     private final JCheckBox addRandom;
-    private final RandomSignalSettings randSettings;
+    private final NoiseSettings noiseSettings;
 
-    public SquareSignalSettings(double defCycleFreq, int defApprox, double defAmplitude, double defMinRVal,
-                                double defMaxRVal, boolean noised) {
+    public SquareSignalSettings(double defCycleFreq, int defApprox, double defAmplitude,
+                                boolean noised, NoiseSettings noiseSettings) {
         frequency = new JTextField(String.valueOf(defCycleFreq));
         approx = new JTextField(String.valueOf(defApprox));
         amplitude = new JTextField(String.valueOf(defAmplitude));
         reverseFourier = new JCheckBox(Application.getString("checkbox.reversefourier"));
-        randSettings = new RandomSignalSettings(defMinRVal, defMaxRVal);
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         addRandom.setSelected(noised);
+        this.noiseSettings = noiseSettings;
         buildGui();
     }
 
@@ -33,7 +32,7 @@ public class SquareSignalSettings extends SignalSettings implements Noisable {
         approx = new JTextField("0");
         amplitude = new JTextField("0");
         reverseFourier = new JCheckBox(Application.getString("checkbox.reversefourier"));
-        randSettings = new RandomSignalSettings();
+        noiseSettings = new NoiseSettings();
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         buildGui();
     }
@@ -85,7 +84,7 @@ public class SquareSignalSettings extends SignalSettings implements Noisable {
 
         nc.gridwidth = 1;
         nc.gridy = 1;
-        noise.add(randSettings, nc);
+        noise.add(noiseSettings, nc);
 
         c.gridy = 0;
         c.anchor = GridBagConstraints.EAST;
@@ -98,7 +97,7 @@ public class SquareSignalSettings extends SignalSettings implements Noisable {
     @Override
     public Signal getSignal() {
         return new SquareSignal(getAmplitude(), getCycleFrequency(), getApprox(), reverseFourier.isSelected(),
-                addRandom.isSelected(), (RandomSignal) randSettings.getSignal()
+                addRandom.isSelected(), noiseSettings.getSignal()
         );
     }
 
@@ -130,12 +129,7 @@ public class SquareSignalSettings extends SignalSettings implements Noisable {
     }
 
     @Override
-    public double getMinRVal() {
-        return randSettings.getMinVal();
-    }
-
-    @Override
-    public double getMaxRVal() {
-        return randSettings.getMaxVal();
+    public NoiseSettings getNoiseSignalSettings() {
+        return noiseSettings;
     }
 }

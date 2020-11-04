@@ -1,7 +1,6 @@
 package io.github.mikhirurg.signalprocessor.gui;
 
 import io.github.mikhirurg.signalprocessor.math.ConstantSignal;
-import io.github.mikhirurg.signalprocessor.math.RandomSignal;
 import io.github.mikhirurg.signalprocessor.math.Signal;
 import io.github.mikhirurg.signalprocessor.util.Application;
 
@@ -11,19 +10,19 @@ import java.awt.*;
 public class ConstantSignalSettings extends SignalSettings implements Noisable {
     private final JTextField val;
     private final JCheckBox addRandom;
-    private final RandomSignalSettings randSettings;
+    private final NoiseSettings noiseSettings;
 
-    public ConstantSignalSettings(double defVal, double defMinRVal, double defMaxRVal, boolean noised) {
+    public ConstantSignalSettings(double defVal, boolean noised, NoiseSettings noiseSettings) {
         val = new JTextField(String.valueOf(defVal));
-        randSettings = new RandomSignalSettings(defMinRVal, defMaxRVal);
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         addRandom.setSelected(noised);
+        this.noiseSettings = noiseSettings;
         buildGui();
     }
 
     public ConstantSignalSettings() {
         val = new JTextField("0");
-        randSettings = new RandomSignalSettings();
+        noiseSettings = new NoiseSettings();
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         buildGui();
     }
@@ -55,7 +54,7 @@ public class ConstantSignalSettings extends SignalSettings implements Noisable {
 
         nc.gridwidth = 1;
         nc.gridy = 1;
-        noise.add(randSettings, nc);
+        noise.add(noiseSettings, nc);
 
         c.gridy = 0;
         c.anchor = GridBagConstraints.EAST;
@@ -71,12 +70,17 @@ public class ConstantSignalSettings extends SignalSettings implements Noisable {
 
     @Override
     public Signal getSignal() {
-        return new ConstantSignal(getVal(), addRandom.isSelected(), (RandomSignal) randSettings.getSignal());
+        return new ConstantSignal(getVal(), addRandom.isSelected(), noiseSettings.getSignal());
     }
 
     @Override
     public boolean isNoised() {
         return addRandom.isSelected();
+    }
+
+    @Override
+    public NoiseSettings getNoiseSignalSettings() {
+        return noiseSettings;
     }
 
     @Override
@@ -87,15 +91,5 @@ public class ConstantSignalSettings extends SignalSettings implements Noisable {
     @Override
     public String getSignalId() {
         return Application.getUSString("type.constant");
-    }
-
-    @Override
-    public double getMinRVal() {
-        return randSettings.getMinVal();
-    }
-
-    @Override
-    public double getMaxRVal() {
-        return randSettings.getMaxVal();
     }
 }

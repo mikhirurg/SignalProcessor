@@ -1,9 +1,9 @@
 package io.github.mikhirurg.signalprocessor.gui;
 
+import io.github.mikhirurg.signalprocessor.math.Signal;
+
 public interface Noisable {
-    double getMinRVal();
-
-    double getMaxRVal();
-
     boolean isNoised();
+
+    NoiseSettings getNoiseSignalSettings();
 }

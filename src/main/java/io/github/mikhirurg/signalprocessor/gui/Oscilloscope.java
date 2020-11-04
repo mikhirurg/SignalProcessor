@@ -2,6 +2,8 @@ package io.github.mikhirurg.signalprocessor.gui;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import io.github.mikhirurg.signalprocessor.tools.FourierProcessingWindow;
+import io.github.mikhirurg.signalprocessor.tools.ReverseFourierWindow;
+import io.github.mikhirurg.signalprocessor.tools.SMAWindow;
 import io.github.mikhirurg.signalprocessor.util.Application;
 import io.github.mikhirurg.signalprocessor.util.Cortege;
 
@@ -55,7 +57,7 @@ public class Oscilloscope extends JFrame {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 SignalSettings signalSettings = currentSignalASettings;
                 if (Application.getString("type.sine").equals(comboBox.getSelectedItem())) {
-                    signalSettings = new SineSignalSettings();
+                    signalSettings = new SineSignalSettings(true);
                 } else if (Application.getString("type.random").equals(comboBox.getSelectedItem())) {
                     signalSettings = new RandomSignalSettings();
                 } else if (Application.getString("type.constant").equals(comboBox.getSelectedItem())) {
@@ -172,9 +174,19 @@ public class Oscilloscope extends JFrame {
 
         if (!signalName.equals(Application.getUSString("type.random"))) {
             Noisable noisable = (Noisable) settings;
-            builder.append(name).append(".minrval = ").append(noisable.getMinRVal()).append("\n")
-                    .append(name).append(".maxrval = ").append(noisable.getMaxRVal()).append("\n")
-                    .append(name).append(".noised = ").append(noisable.isNoised()).append("\n");
+            SignalSettings noiseSignalSettings = ((Noisable) settings).getNoiseSignalSettings().getSignalSettings();
+            builder.append(name).append(".noised = ").append(noisable.isNoised()).append("\n")
+                    .append(name).append(".noise.type = ").append(noiseSignalSettings.getSignalId()).append("\n");
+            if (noiseSignalSettings.getSignalId().equals(Application.getUSString("type.sine"))) {
+                SineSignalSettings sineSignalSettings = (SineSignalSettings) noiseSignalSettings;
+                builder.append(name).append(".noise.amplitude = ").append(sineSignalSettings.getAmplitude()).append("\n")
+                        .append(name).append(".noise.freq = ").append(sineSignalSettings.getFreq()).append("\n")
+                        .append(name).append(".noise.initphase = ").append(sineSignalSettings.getInitPhase()).append("\n");
+            } else if (noiseSignalSettings.getSignalId().equals(Application.getUSString("type.random"))) {
+                RandomSignalSettings randomSignalSettings = (RandomSignalSettings) noiseSignalSettings;
+                builder.append(name).append(".noise.minval = ").append(randomSignalSettings.getMinVal()).append("\n")
+                        .append(name).append(".noise.maxval = ").append(randomSignalSettings.getMaxVal()).append("\n");
+            }
         }
 
         return builder.toString();
@@ -188,21 +200,42 @@ public class Oscilloscope extends JFrame {
     private SignalSettings parseSignalSettings(Properties properties, String name) {
         SignalSettings signalSettings = null;
         String type = properties.getProperty(name + ".type");
+        String noiseType = properties.getProperty(name + ".noise.type");
+        NoiseSettings settings = new NoiseSettings();
+        if (noiseType.equals(Application.getUSString("type.sine"))) {
+            settings = new NoiseSettings(
+                    new SineSignalSettings(
+                            Double.parseDouble(properties.getProperty(name + ".noise.amplitude")),
+                            Double.parseDouble(properties.getProperty(name + ".noise.freq")),
+                            Double.parseDouble(properties.getProperty(name + ".noise.initphase")),
+                            false,
+                            new NoiseSettings(),
+                            false
+                    )
+            );
+        } else if (noiseType.equals(Application.getUSString("type.random"))) {
+            settings = new NoiseSettings(
+                    new RandomSignalSettings(
+                            Double.parseDouble(properties.getProperty(name + ".noise.minval")),
+                            Double.parseDouble(properties.getProperty(name + ".noise.maxval"))
+                    )
+            );
+        }
+
         if (type.equals(Application.getUSString("type.sine"))) {
             signalSettings = new SineSignalSettings(
                     Double.parseDouble(properties.getProperty(name + ".amplitude")),
                     Double.parseDouble(properties.getProperty(name + ".freq")),
                     Double.parseDouble(properties.getProperty(name + ".initphase")),
-                    Double.parseDouble(properties.getProperty(name + ".minrval")),
-                    Double.parseDouble(properties.getProperty(name + ".maxrval")),
-                    Boolean.parseBoolean(properties.getProperty(name + ".noised"))
+                    Boolean.parseBoolean(properties.getProperty(name + ".noised")),
+                    settings,
+                    true
             );
         } else if (type.equals(Application.getUSString("type.constant"))) {
             signalSettings = new ConstantSignalSettings(
                     Double.parseDouble(properties.getProperty(name + ".val")),
-                    Double.parseDouble(properties.getProperty(name + ".minrval")),
-                    Double.parseDouble(properties.getProperty(name + ".maxrval")),
-                    Boolean.parseBoolean(properties.getProperty(name + ".noised"))
+                    Boolean.parseBoolean(properties.getProperty(name + ".noised")),
+                    settings
             );
         } else if (type.equals(Application.getUSString("type.random"))) {
             signalSettings = new RandomSignalSettings(
@@ -214,27 +247,24 @@ public class Oscilloscope extends JFrame {
                     Double.parseDouble(properties.getProperty(name + ".minval")),
                     Double.parseDouble(properties.getProperty(name + ".maxval")),
                     Double.parseDouble(properties.getProperty(name + ".amplitude")),
-                    Double.parseDouble(properties.getProperty(name + ".minrval")),
-                    Double.parseDouble(properties.getProperty(name + ".maxrval")),
-                    Boolean.parseBoolean(properties.getProperty(name + ".noised"))
+                    Boolean.parseBoolean(properties.getProperty(name + ".noised")),
+                    settings
             );
         } else if (type.equals(Application.getUSString("type.square"))) {
             signalSettings = new SquareSignalSettings(
                     Double.parseDouble(properties.getProperty(name + ".cyclefrequency")),
                     Integer.parseInt(properties.getProperty(name + ".approximation")),
                     Double.parseDouble(properties.getProperty(name + ".amplitude")),
-                    Double.parseDouble(properties.getProperty(name + ".minrval")),
-                    Double.parseDouble(properties.getProperty(name + ".maxrval")),
-                    Boolean.parseBoolean(properties.getProperty(name + ".noised"))
+                    Boolean.parseBoolean(properties.getProperty(name + ".noised")),
+                    settings
             );
         } else if (type.equals(Application.getUSString("type.sawtooth"))) {
             signalSettings = new SawtoothSignalSettings(
                     Double.parseDouble(properties.getProperty(name + ".cyclefrequency")),
                     Double.parseDouble(properties.getProperty(name + ".amplitude")),
                     Integer.parseInt(properties.getProperty(name + ".approximation")),
-                    Double.parseDouble(properties.getProperty(name + ".minrval")),
-                    Double.parseDouble(properties.getProperty(name + ".maxrval")),
-                    Boolean.parseBoolean(properties.getProperty(name + ".noised"))
+                    Boolean.parseBoolean(properties.getProperty(name + ".noised")),
+                    settings
             );
         }
 
@@ -273,8 +303,12 @@ public class Oscilloscope extends JFrame {
 
         JMenu tools = new JMenu(Application.getString("menu.tools"));
         JMenuItem fourier = new JMenuItem(Application.getString("menu.tools.fourier"));
+        JMenuItem sma = new JMenuItem(Application.getString("menu.tools.sma"));
+        JMenuItem reverseFourier = new JMenuItem(Application.getString("menu.tools.reversefourier"));
         menuBar.add(tools);
         tools.add(fourier);
+        tools.add(sma);
+        tools.add(reverseFourier);
 
         Display display = new Display();
         c.gridx = 0;
@@ -360,6 +394,12 @@ public class Oscilloscope extends JFrame {
         FourierProcessingWindow fourierProcessingWindow = new FourierProcessingWindow(display);
         fourier.addActionListener(e -> fourierProcessingWindow.setVisible(true));
 
+        SMAWindow smaWindow = new SMAWindow(display);
+        sma.addActionListener(e -> smaWindow.setVisible(true));
+
+        ReverseFourierWindow reverseFourierWindow = new ReverseFourierWindow(display);
+        reverseFourier.addActionListener(e -> reverseFourierWindow.setVisible(true));
+
         JCheckBox grid = new JCheckBox(Application.getString("checkbox.grid"));
         grid.addActionListener(e -> {
             display.setGrid(grid.isSelected());
@@ -389,15 +429,15 @@ public class Oscilloscope extends JFrame {
         JTextArea textArea = new JTextArea();
         textArea.setText(display.getData().stream().map(e ->
                 e.toString().replaceAll(",", " : "))
-                        .collect(Collectors.joining("\n")));
+                .collect(Collectors.joining("\n")));
 
         textArea.setRows(8);
         textArea.setColumns(20);
         textArea.setEditable(false);
         display.getTimer().addActionListener(e -> {
-            textArea.setText( display.getData().stream().map(e1 ->
-                e1.toString().replaceAll(",", " : "))
-                        .collect(Collectors.joining("\n")));
+            textArea.setText(display.getData().stream().map(e1 ->
+                    e1.toString().replaceAll(",", " : "))
+                    .collect(Collectors.joining("\n")));
             array.setText(Application.getString("textarea.array") + " (" + display.getData().size() + ")");
         });
 

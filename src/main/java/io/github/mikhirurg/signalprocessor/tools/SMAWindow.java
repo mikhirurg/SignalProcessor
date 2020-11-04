@@ -1,14 +1,15 @@
 package io.github.mikhirurg.signalprocessor.tools;
 
 import io.github.mikhirurg.signalprocessor.gui.Display;
-import io.github.mikhirurg.signalprocessor.math.FourierProcessor;
+import io.github.mikhirurg.signalprocessor.math.SMAProcessor;
 import io.github.mikhirurg.signalprocessor.util.Application;
-import io.github.mikhirurg.signalprocessor.util.ComplexNumber;
 import io.github.mikhirurg.signalprocessor.util.Cortege;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -16,14 +17,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+public class SMAWindow extends JFrame {
+    private final GraphPanel graph;
+    private List<Cortege<Double>> data;
 
-public class FourierProcessingWindow extends JFrame {
-    private final FourierPanel graph;
-    private List<ComplexNumber> data;
-
-    public FourierProcessingWindow(Display display) {
-        setTitle(Application.getString("menu.tools.fourier"));
-        graph = new FourierPanel();
+    public SMAWindow(Display display) {
+        setTitle(Application.getString("menu.tools.sma"));
+        graph = new GraphPanel();
         data = new LinkedList<>();
         int width = Integer.parseInt(Application.getProperty("display.width"));
         int height = Integer.parseInt(Application.getProperty("display.height"));
@@ -35,12 +35,12 @@ public class FourierProcessingWindow extends JFrame {
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 1;
-        c.anchor = GridBagConstraints.NORTH;
         c.gridy = 0;
         c.gridwidth = 1;
         c.gridheight = 1;
         c.insets.top = Integer.parseInt(Application.getProperty("settings.yinset"));
         c.insets.left = Integer.parseInt(Application.getProperty("settings.xinset"));
+        c.anchor = GridBagConstraints.NORTH;
 
         ButtonGroup buttonGroup = new ButtonGroup();
         JRadioButton signalA = new JRadioButton(Application.getString("signal.signalA"));
@@ -54,17 +54,29 @@ public class FourierProcessingWindow extends JFrame {
         c.gridx = 2;
         add(signalB, c);
 
+        JLabel windowLabel = new JLabel(Application.getString("label.window"));
         c.gridy = 1;
+        c.gridx = 1;
+        add(windowLabel, c);
+
+        JTextField textField = new JTextField("10");
+        c.gridy = 1;
+        c.gridx = 2;
+        c.gridwidth = 1;
+        add(textField, c);
+
+        c.gridy = 2;
+        c.gridwidth = 1;
         c.gridx = 1;
         add(button, c);
         button.addActionListener(e -> {
             try {
                 int signal = signalA.isSelected() ? 0 : 1;
-                data = FourierProcessor.getFourierProcessing(display.getData(), signal);
+                int window = Integer.parseInt(textField.getText());
+                data = SMAProcessor.getSMAProcessing(display.getData(), window, signal);
                 if (display.getData().size() > 0 && data.size() > 0) {
-                    graph.setSignalData(display.getData());
-                    graph.setData(data);
-                    graph.repaint();
+                    graph.setSignalData(data);
+                    graph.start();
                 } else throw new Exception();
             } catch (Exception e1) {
                 JOptionPane.showMessageDialog(this, Application.getString("dialog.emptyarray"));
@@ -81,19 +93,19 @@ public class FourierProcessingWindow extends JFrame {
                 File selected = fileChooser.getSelectedFile();
                 try {
                     int signal = signalA.isSelected() ? 0 : 1;
-                    List<Cortege<Double>> signalData = FourierProcessor.getSignalData(selected);
-                    data = FourierProcessor.getFourierProcessing(selected, signal);
+                    int window = Integer.parseInt(textField.getText());
+                    List<Cortege<Double>> signalData = SMAProcessor.getSignalData(selected);
+                    data = SMAProcessor.getSMAProcessing(selected, window, signal);
                     if (signalData.size() > 0 && data.size() > 0) {
-                        graph.setSignalData(signalData);
-                        graph.setData(data);
-                        graph.repaint();
+                        graph.setSignalData(data);
+                        graph.start();
                     } else throw new Exception();
                 } catch (Exception e1) {
                     JOptionPane.showMessageDialog(this, Application.getString("dialog.emptyarray"));
                 }
             }
         });
-        c.gridy = 1;
+        c.gridy = 2;
         c.gridx = 2;
         add(importCsv, c);
 
@@ -107,7 +119,7 @@ public class FourierProcessingWindow extends JFrame {
                 File selected = fileChooser.getSelectedFile();
                 try (FileWriter fileWriter = new FileWriter(selected)) {
                     fileWriter.write(data.stream()
-                            .map(ComplexNumber::toString)
+                            .map(Cortege::toString)
                             .collect(Collectors.joining("\n"))
                     );
                 } catch (IOException fileNotFoundException) {
@@ -116,19 +128,24 @@ public class FourierProcessingWindow extends JFrame {
             }
         });
         c.gridx = 1;
-        c.gridy = 2;
+        c.gridy = 3;
         add(saveProcessed, c);
 
         c.gridy = 0;
         c.gridx = 0;
-        c.gridheight = 3;
+        c.gridheight = 4;
         c.insets.top = 0;
         c.insets.left = 0;
         add(graph, c);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                graph.stop();
+            }
+        });
+
         setResizable(false);
         pack();
-
     }
-
-
 }

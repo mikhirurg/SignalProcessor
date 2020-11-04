@@ -7,15 +7,15 @@ public class SquareSignal implements Signal {
     private final int approx;
     private final boolean isReverse;
     private final boolean addRandom;
-    private final RandomSignal randomSignal;
+    private final Signal noiseSignal;
 
-    public SquareSignal(double amplitude, double freq, int approx, boolean isReverse, boolean addRandom, RandomSignal randomSignal) {
+    public SquareSignal(double amplitude, double freq, int approx, boolean isReverse, boolean addRandom, Signal noiseSignal) {
         this.freq = freq;
         this.approx = approx;
         this.amplitude = amplitude;
         this.isReverse = isReverse;
         this.addRandom = addRandom;
-        this.randomSignal = randomSignal;
+        this.noiseSignal = noiseSignal;
     }
 
     public double generateValue(double t) {
@@ -27,6 +27,6 @@ public class SquareSignal implements Signal {
 
         result = amplitude * 4 * result / Math.PI;
 
-        return addRandom ? result + randomSignal.generateValue(t) : result;
+        return addRandom ? result + noiseSignal.generateValue(t) : result;
     }
 }

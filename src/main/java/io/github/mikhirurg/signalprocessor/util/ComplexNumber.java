@@ -29,6 +29,10 @@ public class ComplexNumber {
         return new ComplexNumber(this.re * k, this.im * k);
     }
 
+    public ComplexNumber mul(ComplexNumber other) {
+        return new ComplexNumber(re * other.re - im * other.im, re * other.im + im * other.re);
+    }
+
     public static ComplexNumber sum(ComplexNumber first, ComplexNumber second) {
         return new ComplexNumber(first.re + second.getRe(), first.im + second.im);
     }

@@ -4,15 +4,15 @@ public class ConstantSignal implements Signal {
 
     private final double val;
     private final boolean addRandom;
-    private final RandomSignal randomSignal;
+    private final Signal noiseSignal;
 
-    public ConstantSignal(double val, boolean addRandom, RandomSignal randomSignal) {
+    public ConstantSignal(double val, boolean addRandom, Signal noiseSignal) {
         this.val = val;
         this.addRandom = addRandom;
-        this.randomSignal = randomSignal;
+        this.noiseSignal = noiseSignal;
     }
 
     public double generateValue(double t) {
-        return addRandom ? val + randomSignal.generateValue(t) : val;
+        return addRandom ? val + noiseSignal.generateValue(t) : val;
     }
 }

@@ -1,6 +1,5 @@
 package io.github.mikhirurg.signalprocessor.gui;
 
-import io.github.mikhirurg.signalprocessor.math.RandomSignal;
 import io.github.mikhirurg.signalprocessor.math.SawtoothSignal;
 import io.github.mikhirurg.signalprocessor.math.Signal;
 import io.github.mikhirurg.signalprocessor.util.Application;
@@ -14,18 +13,17 @@ public class SawtoothSignalSettings extends SignalSettings implements Noisable {
     private final JTextField approx;
     private final JCheckBox reverseFourier;
     private final JCheckBox addRandom;
-    private final RandomSignalSettings randSettings;
+    private final NoiseSettings noiseSettings;
 
 
-    public SawtoothSignalSettings(double defFreq, double defAmplitude, int defApprox, double defMinRVal,
-                                  double defMaxRVal, boolean noised) {
+    public SawtoothSignalSettings(double defFreq, double defAmplitude, int defApprox, boolean noised, NoiseSettings noiseSettings) {
         freq = new JTextField(String.valueOf(defFreq));
         amplitude = new JTextField(String.valueOf(defAmplitude));
         approx = new JTextField(String.valueOf(defApprox));
         reverseFourier = new JCheckBox(Application.getString("checkbox.reversefourier"));
-        randSettings = new RandomSignalSettings(defMinRVal, defMaxRVal);
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         addRandom.setSelected(noised);
+        this.noiseSettings = noiseSettings;
         buildGui();
     }
 
@@ -34,7 +32,7 @@ public class SawtoothSignalSettings extends SignalSettings implements Noisable {
         amplitude = new JTextField("0");
         approx = new JTextField("0");
         reverseFourier = new JCheckBox(Application.getString("checkbox.reversefourier"));
-        randSettings = new RandomSignalSettings();
+        noiseSettings = new NoiseSettings();
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         buildGui();
     }
@@ -85,7 +83,7 @@ public class SawtoothSignalSettings extends SignalSettings implements Noisable {
 
         nc.gridwidth = 1;
         nc.gridy = 1;
-        noise.add(randSettings, nc);
+        noise.add(noiseSettings, nc);
 
         c.gridy = 0;
         c.anchor = GridBagConstraints.EAST;
@@ -107,23 +105,20 @@ public class SawtoothSignalSettings extends SignalSettings implements Noisable {
         return Integer.parseInt(approx.getText());
     }
 
-    public double getMinRVal() {
-        return randSettings.getMinVal();
-    }
-
-    public double getMaxRVal() {
-        return randSettings.getMaxVal();
-    }
-
     @Override
     public boolean isNoised() {
         return addRandom.isSelected();
     }
 
     @Override
+    public NoiseSettings getNoiseSignalSettings() {
+        return noiseSettings;
+    }
+
+    @Override
     public Signal getSignal() {
         return new SawtoothSignal(getFrequency(), getAmplitude(), getApproximation(), reverseFourier.isSelected(),
-                addRandom.isSelected(), (RandomSignal) randSettings.getSignal());
+                addRandom.isSelected(), noiseSettings.getSignal());
     }
 
     @Override

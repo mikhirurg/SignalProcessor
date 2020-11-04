@@ -1,6 +1,5 @@
 package io.github.mikhirurg.signalprocessor.gui;
 
-import io.github.mikhirurg.signalprocessor.math.RandomSignal;
 import io.github.mikhirurg.signalprocessor.math.RangeSignal;
 import io.github.mikhirurg.signalprocessor.math.Signal;
 import io.github.mikhirurg.signalprocessor.util.Application;
@@ -13,16 +12,16 @@ public class RangeSignalSettings extends SignalSettings implements Noisable {
     private final JTextField maxVal;
     private final JTextField amplitude;
     private final JCheckBox addRandom;
-    private final RandomSignalSettings randSettings;
+    private final NoiseSettings noiseSettings;
 
-    public RangeSignalSettings(double defMinVal, double defMaxVal, double defAmplitude, double defMinRVal,
-                               double defMaxRVal, boolean noised) {
+    public RangeSignalSettings(double defMinVal, double defMaxVal, double defAmplitude,
+                               boolean noised, NoiseSettings noiseSettings) {
         amplitude = new JTextField(String.valueOf(defAmplitude));
         minVal = new JTextField(String.valueOf(defMinVal));
         maxVal = new JTextField(String.valueOf(defMaxVal));
-        randSettings = new RandomSignalSettings(defMinRVal, defMaxRVal);
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         addRandom.setSelected(noised);
+        this.noiseSettings = noiseSettings;
         buildGui();
     }
 
@@ -30,7 +29,7 @@ public class RangeSignalSettings extends SignalSettings implements Noisable {
         amplitude = new JTextField("0");
         minVal = new JTextField("0");
         maxVal = new JTextField("0");
-        randSettings = new RandomSignalSettings();
+        noiseSettings = new NoiseSettings();
         addRandom = new JCheckBox(Application.getString("checkbox.noise"));
         buildGui();
     }
@@ -78,7 +77,7 @@ public class RangeSignalSettings extends SignalSettings implements Noisable {
 
         nc.gridwidth = 1;
         nc.gridy = 1;
-        noise.add(randSettings, nc);
+        noise.add(noiseSettings, nc);
 
         c.gridy = 0;
         c.anchor = GridBagConstraints.EAST;
@@ -103,7 +102,7 @@ public class RangeSignalSettings extends SignalSettings implements Noisable {
     @Override
     public Signal getSignal() {
         return new RangeSignal(getMinVal(), getMaxVal(), getAmplitude(), addRandom.isSelected(),
-                (RandomSignal) randSettings.getSignal());
+                noiseSettings.getSignal());
     }
 
     @Override
@@ -117,17 +116,12 @@ public class RangeSignalSettings extends SignalSettings implements Noisable {
     }
 
     @Override
-    public double getMinRVal() {
-        return randSettings.getMinVal();
-    }
-
-    @Override
-    public double getMaxRVal() {
-        return randSettings.getMaxVal();
-    }
-
-    @Override
     public boolean isNoised() {
         return addRandom.isSelected();
+    }
+
+    @Override
+    public NoiseSettings getNoiseSignalSettings() {
+        return noiseSettings;
     }
 }

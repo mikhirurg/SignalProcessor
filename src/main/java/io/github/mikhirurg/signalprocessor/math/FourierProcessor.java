@@ -13,13 +13,44 @@ public class FourierProcessor {
     public static List<ComplexNumber> getFourierProcessing(List<Cortege<Double>> data, int signal) {
         List<ComplexNumber> result = new LinkedList<>();
         int N = data.size();
-        for (int k = 0; k < N / 2; k++) {
+        for (int k = 0; k < N; k++) {
             ComplexNumber Xk = new ComplexNumber(0, 0);
             for (int n = 0; n < N; n++) {
-                Xk = Xk.plus(new ComplexNumber(Math.cos(2 * Math.PI * k * n / N), - Math.sin(2 * Math.PI * k * n / N)).mul(signal == 0 ? data.get(n).getSecond() : data.get(n).getThird()));
+                Xk = Xk.plus(new ComplexNumber(Math.cos(2 * Math.PI * k * n / N), -Math.sin(2 * Math.PI * k * n / N)).mul(signal == 0 ? data.get(n).getSecond() : data.get(n).getThird()));
             }
             result.add(Xk);
         }
+        return result;
+    }
+
+    public static List<Cortege<Double>> getReverseFourierProcessing(List<Cortege<Double>> data, List<ComplexNumber> fourierData, int signal) {
+        int N = data.size();
+        List<Cortege<Double>> result = new LinkedList<>(data);
+        for (int n = 0; n < N; n++) {
+            ComplexNumber Xk = new ComplexNumber(0, 0);
+            for (int k = 0; k < N; k++) {
+                Xk = Xk.plus(fourierData.get(k).mul(new ComplexNumber(Math.cos(2.0 * Math.PI * k * n / N), Math.sin(2.0 * Math.PI * k * n / N))));
+            }
+            Xk = Xk.mul(1.0 / N);
+            Cortege<Double> signalVal = new Cortege<>(
+                    data.get(n).getFirst(),
+                    signal == 0 ? Xk.getRe() : data.get(n).getSecond(),
+                    signal == 1 ? Xk.getRe() : data.get(n).getThird()
+            );
+            result.set(n, signalVal);
+        }
+        return result;
+    }
+
+    public static List<ComplexNumber> filterFourier(List<ComplexNumber> data, double min, double max) {
+        int N = data.size();
+        List<ComplexNumber> result = new LinkedList<>(data);
+        for (int k = 0; k < N; k++) {
+            if (result.get(k).getABS() < min || result.get(k).getABS() > max) {
+                result.set(k, new ComplexNumber(0, 0));
+            }
+        }
+
         return result;
     }
 
