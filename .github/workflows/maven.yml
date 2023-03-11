@@ -43,7 +43,7 @@ jobs:
           cache: maven
           
       - run: mvn clean package assembly:single
-      - run: mkdir staging && cp target/*-jar-with-dependencies staging
+      - run: mkdir staging && cp target/*-jar-with-dependencies.jar staging
       - uses: actions/upload-artifact@v3
         with:
           name: Package
