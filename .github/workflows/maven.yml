@@ -42,7 +42,7 @@ jobs:
           distribution: 'adopt'
           cache: maven
           
-      - run: mvn -B package --file pom.xml -DskipTests
+      - run: mvn clean package assembly:single
       - run: mkdir staging && cp target/*-SNAPSHOT.jar staging
       - uses: actions/upload-artifact@v3
         with:
