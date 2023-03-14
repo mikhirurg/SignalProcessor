@@ -275,7 +275,9 @@ public class Oscilloscope extends JFrame {
         setTitle(Application.getString("title"));
 
         try {
-            UIManager.setLookAndFeel(new FlatIntelliJLaf());
+            if (Application.getOS() != Application.Os.MAC) {
+                UIManager.setLookAndFeel(new FlatIntelliJLaf());
+            }
         } catch (UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
