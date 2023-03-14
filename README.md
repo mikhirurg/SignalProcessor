@@ -1,4 +1,5 @@
 # SingnalProcessor
+[![Build](https://github.com/mikhirurg/SignalProcessor/actions/workflows/maven.yml/badge.svg)](https://github.com/mikhirurg/SignalProcessor/actions/workflows/maven.yml)
 
 ## Project description
 
