@@ -4,10 +4,7 @@ import io.github.mikhirurg.signalprocessor.gui.Oscilloscope;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class Application {
     private static final Properties appProperties;
@@ -26,7 +23,13 @@ public class Application {
             }
         }
         appProperties = properties;
-        resourceBundle = PropertyResourceBundle.getBundle("AppBundle");
+        ResourceBundle resourceBundleTmp;
+        try {
+            resourceBundleTmp = PropertyResourceBundle.getBundle("AppBundle");
+        } catch (MissingResourceException e) {
+            resourceBundleTmp = PropertyResourceBundle.getBundle("AppBundle", Locale.forLanguageTag("en"));
+        }
+        resourceBundle = resourceBundleTmp;
         resourceBundleUS = PropertyResourceBundle.getBundle("AppBundle", Locale.forLanguageTag("en-us"));
     }
 
