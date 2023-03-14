@@ -25,12 +25,12 @@ On the left side of the application window, there is a "screen" that displays si
 
 ### Suported signals
 
-- Constant signal: fixed point on the oscilloscope display
-- Sinusoidal signal: user can set the amplitude, frequency and initial phase of the signal
-- Noise signal: user can set the minimal and maximal value for the signal
-- Meander signal (square waveform): this signal is modeled by using the Fourier series. Users can set the amplitude and frequency of the signal. Additionally, the user can set the number of elements of the Fourier series used to model the signal.
-- Sawtooth signal: the signal is modeled by using the Fourier series. The user can set the amplitude, frequency, and number of the Fourier series used to model the signal.
-- "Range" signal: the signal is just moving the oscilloscope ray from right to left in a given range.
+- **Constant signal:** fixed point on the oscilloscope display
+- **Sinusoidal signal:** user can set the amplitude, frequency and initial phase of the signal
+- **Noise signal:** user can set the minimal and maximal value for the signal
+- **Meander signal (square waveform):** this signal is modeled by using the Fourier series. Users can set the amplitude and frequency of the signal. Additionally, the user can set the number of elements of the Fourier series used to model the signal.
+- **Sawtooth signal:** the signal is modeled by using the Fourier series. The user can set the amplitude, frequency, and number of the Fourier series used to model the signal.
+- **"Range" signal:** the signal is just moving the oscilloscope ray from right to left in a given range.
 
 ### The noise functionality
 
