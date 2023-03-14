@@ -14,7 +14,7 @@ There are a few different ways how a user can obtain the jar file to execute the
 After obtaining the executable jar, user can just run the following command:
 
 ```
-java -jar ElectricField.jar
+java -jar SignalProcessor*.jar
 ```
 
 ## How to use the project
