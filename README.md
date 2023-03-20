@@ -81,7 +81,7 @@ $$
 | $A_1=200, f_1=5, \phi_1=\frac{\pi}{2},$ <br /> $A_2=200, f_2=4, \phi_2=0$ | <img src="/img/demo_4.png" alt="Demo 4" width=400> |
 
 ### Sawtooth signal
-$$ y(t) = -\frac{2A}{\pi}\cdot \sum_{k=1}^{n}{\frac{(-1)^\cdot sin(2\pi k f t)}{k}} $$
+$$ y(t) = -\frac{2A}{\pi}\cdot \sum_{k=1}^{n}{\frac{(-1)^n\cdot sin(2\pi k f t)}{k}} $$
 
 | Configuration                                        | Demonstration                                      |
 |------------------------------------------------------|----------------------------------------------------|
